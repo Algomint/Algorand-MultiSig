@@ -2,6 +2,10 @@
 
 This repo, includes all of the code necessary to facilitate the signing of multi-signature transactions without exposing SK's.
 
+### Contributors
+- [Umar Farooq](https://github.com/UmarFarooq-MP)
+- [Ronan Clooney](https://github.com/clooneyr)
+
 
 ## Set-up guide
 
