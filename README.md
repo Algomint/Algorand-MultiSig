@@ -11,6 +11,7 @@ This repo, includes all of the code necessary to facilitate the signing of multi
 
 
 ## Design Flow
+<img width="791" alt="Screen Shot 2022-07-15 at 5 29 56 pm" src="https://user-images.githubusercontent.com/73086339/179174428-20f708bf-8eaf-4f5a-959a-7fa03e857835.png">
 
 ### Backend
 
