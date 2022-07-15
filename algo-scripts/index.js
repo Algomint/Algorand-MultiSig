@@ -44,6 +44,10 @@ async function mintToken() {
             params,
         );
 
+
+        //
+        // Line 51 & 52 aswell as line 57 are the lines of interest in this file
+        //
         let binaryMultisigTx = txn.toByte();
         let base64MultisigTx = byteArrayToBase64(binaryMultisigTx);
 
