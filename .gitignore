@@ -1,0 +1,4 @@
+algo-scripts/node_modules
+.DS_Store
+algo-scripts/.env
+frontend/node_modules

@@ -41,7 +41,23 @@ cd frontend
 ```
 npm i or npm install
 ```
+head to utils/algodClient.ts and update the X-API-Key key-pair with your purestake api key.
 ```
 npm start
 ```
-After the above commands have been executed you will have the frontend running on localhost:3000/sign
+After the above commands have been executed you will have the frontend running on localhost:3000
+
+### AlgorandSDK scripts
+In this folder you are able to use the provided template to construct the TXN's you would like to be send to the backend to be signed.
+
+```
+cd algo-scripts
+```
+```
+npm i or npm install
+```
+Create a .env file and store your purestake api in the following format
+```
+PURESTAKE_API_TOKEN='example`
+```
+
