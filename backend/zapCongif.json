@@ -1,0 +1,13 @@
+{
+    "level": "debug",
+    "encoding": "json",
+    "outputPaths": ["stdout", "out.json"],       
+       "errorOutputPaths": ["stderr", "out.json"],
+    "initialFields": {"appName": "Multi-sig Service"},
+    "encoderConfig": {
+      "messageKey": "message",
+      "levelKey": "level",
+      "levelEncoder": "lowercase"
+    }
+  }
+  
