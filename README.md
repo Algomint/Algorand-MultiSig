@@ -66,6 +66,6 @@ npm i or npm install
 ```
 Create a .env file and store your purestake api in the following format
 ```
-PURESTAKE_API_TOKEN='example`
+PURESTAKE_API_TOKEN='example'
 ```
 
