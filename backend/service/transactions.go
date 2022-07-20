@@ -2,6 +2,7 @@ package service
 
 import (
 	"fmt"
+	"go.uber.org/zap"
 	"multisigdb-svc/db_utils"
 	"multisigdb-svc/dto"
 	"multisigdb-svc/model"
@@ -14,11 +15,10 @@ func CreateRawTransaction(txn dto.RawTxn) (dto.Response, error) {
 
 	err := db_utils.AddRawTxn(rawTxn)
 	if err != nil {
+		logger.Error("Error in AddRawTxn with the message : ", zap.Error(err))
 		return dto.Response{}, err
 	}
-
 	return dto.Response{Success: true, Message: "Transaction Added"}, nil
-
 }
 
 func CreateSignedTransaction(txn dto.SignedTxn) (dto.Response, error) {
@@ -29,10 +29,12 @@ func CreateSignedTransaction(txn dto.SignedTxn) (dto.Response, error) {
 	if db_utils.CheckIfATxnExistsAndSignsNeeded(txn.TxnId) == false {
 		response.Message = "Transaction already signed or invalid Transaction id"
 		response.Success = false
+		logger.Error("Error in CheckIfATxnExistsAndSignsNeeded with the message : Transaction already signed or invalid Transaction id")
 		return response, fmt.Errorf("Transaction not found")
 	}
 
 	if !utils.ValidateDuplicatePublicAddress(txn.SignerPublicAddress, txn.TxnId) {
+		logger.Error("Error in utils.ValidateDuplicatePublicAddress with the message : Transaction already signed by this public address")
 		response.Message = "Transaction already signed by this public address"
 		response.Success = false
 		return response, fmt.Errorf("Transaction not found")
@@ -46,6 +48,8 @@ func CreateSignedTransaction(txn dto.SignedTxn) (dto.Response, error) {
 
 	err = db_utils.AddSignedTxn(signedTxn)
 	if err != nil {
+		logger.Error("Error in CheckIfATxnExistsAndSignsNeeded with the message : ", zap.Error(err))
+
 		response.Message = err.Error()
 		response.Success = false
 		return response, err
@@ -59,6 +63,8 @@ func CreateSignedTransaction(txn dto.SignedTxn) (dto.Response, error) {
 
 	currentSignCount, errMessage := db_utils.GetCurrentNumberOfSignature(txn.TxnId)
 	if errMessage != nil {
+		logger.Error("Error in db_utils.GetCurrentNumberOfSignature with the message : ", zap.Error(errMessage))
+
 		response.Message = "Something went wrong while updating RawTxn Table"
 		response.Success = false
 		return response, err
@@ -67,6 +73,8 @@ func CreateSignedTransaction(txn dto.SignedTxn) (dto.Response, error) {
 	if currentSignCount == 0 {
 		err = db_utils.UpdateStatusOfTransaction(txn.TxnId, "READY")
 		if err != nil {
+			logger.Error("Error in db_utils.UpdateStatusOfTransaction with the message : ", zap.Error(err))
+
 			response.Message = "Something went wrong while updating RawTxn Table"
 			response.Success = false
 			return response, err
@@ -74,6 +82,8 @@ func CreateSignedTransaction(txn dto.SignedTxn) (dto.Response, error) {
 	} else {
 		err = db_utils.UpdateStatusOfTransaction(txn.TxnId, "PENDING")
 		if err != nil {
+			logger.Error("Error in db_utils.UpdateStatusOfTransaction with the message : ", zap.Error(err))
+
 			response.Message = "Something went wrong while updating RawTxn Table"
 			response.Success = false
 			return response, err

@@ -22,7 +22,6 @@ func AddRawTxn(ctx *gin.Context) {
 		return
 	}
 	ctx.JSON(http.StatusOK, resp)
-
 }
 
 func AddSingedTxn(ctx *gin.Context) {
