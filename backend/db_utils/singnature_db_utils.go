@@ -163,7 +163,7 @@ func FindAllTxnWithTxnStatusReady() []model.RawTxn {
 }
 
 func UpdateStatusOfTransactionToDone(txn string) error {
-	err := db.DbConnection.Model(&model.RawTxn{}).Where("txn_id = ?", txn).Update("status", "DONE").Error
+	err := db.DbConnection.Model(&model.RawTxn{}).Where("txn_id = ?", txn).Update("status", "BROADCASTED").Error
 	if err != nil {
 		return err
 	}

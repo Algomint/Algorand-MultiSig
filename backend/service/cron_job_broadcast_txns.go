@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"multisigdb-svc/client"
+	"multisigdb-svc/config"
 	"multisigdb-svc/db_utils"
 	"multisigdb-svc/pkg/utils"
 )
@@ -26,11 +27,17 @@ func BroadCastTheSignedTxn() {
 		}
 
 		algodClient := client.AlgoRandClient()
+
 		_, err = algodClient.SendRawTransaction(mergeTxns).Do(context.Background())
 		if err != nil {
-			logger.Error(fmt.Sprintf("Failed to send transaction with error message: %s\n", err))
+			if err.Error() == config.KnownTLSError {
+				logger.Error(fmt.Sprintf("Failed to send transaction %s with TLS error trying in next round", txnId))
+				return
+			}
+			db_utils.UpdateStatusOfTransaction(value.TxnId, "FAILED")
+			logger.Error(fmt.Sprintf("Failed to send transaction %s with error message: %s", txnId, err))
 			return
 		}
-		waitForConfirmation(txnId, algodClient)
+		go waitForConfirmation(value.TxnId, txnId, algodClient)
 	}
 }
