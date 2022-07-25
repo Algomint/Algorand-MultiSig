@@ -33,7 +33,7 @@ func MergeTransactions(txnId string) ([]byte, string, error) {
 	return signedTxns, txnId, nil
 }
 
-func waitForConfirmation(txID string, client *algod.Client) {
+func waitForConfirmation(txID, networkTxID string, client *algod.Client) {
 	status, err := client.Status().Do(context.Background())
 	if err != nil {
 		logger.Error(fmt.Sprintf("error getting algod status: %s\n", err))
@@ -41,24 +41,25 @@ func waitForConfirmation(txID string, client *algod.Client) {
 	}
 	lastRound := status.LastRound
 	for {
-		pt, _, err := client.PendingTransactionInformation(txID).Do(context.Background())
+		pt, _, err := client.PendingTransactionInformation(networkTxID).Do(context.Background())
 		if err != nil {
 			logger.Error(fmt.Sprintf("error getting pending transaction: %s\n", err))
 			ok := db_utils.UpdateStatusOfTransaction(txID, "DECLINED")
 			if ok != nil {
-				logger.Error("Error while updating the the status of transaction with the error message :", zap.Error(ok))
+				logger.Error("Error while updating the status of transaction with the error message :", zap.Error(ok))
 			}
 			return
 		}
 		if pt.ConfirmedRound > 0 {
+			ok := db_utils.UpdateStatusOfTransaction(txID, "BROADCASTED")
+			if ok != nil {
+				logger.Error("Error while updating the status of transaction to success with the error message :", zap.Error(ok))
+			}
 			logger.Info(fmt.Sprintf("Transaction confirmed in round %d\n", pt.ConfirmedRound))
 			break
 		}
 		logger.Info("Waiting for confirmation...")
 		lastRound++
 		status, err = client.StatusAfterBlock(lastRound).Do(context.Background())
-	}
-	if err = db_utils.UpdateStatusOfTransactionToDone(txID); err != nil {
-		logger.Error("Error while UpdateStatusOfTransactionToDone with the message : ", zap.Error(err))
 	}
 }
