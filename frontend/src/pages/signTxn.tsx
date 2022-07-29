@@ -77,20 +77,22 @@ function App() {
     <Container component="main" maxWidth="xs">
       <CssBaseline />
       <div className={classes.paper}>
-        <Typography component="h1" variant="h5">
+        <Typography component="h1" variant="h2" className={classes.heading}>
           Multi-Sig Txn Signer
         </Typography>
 
-        <Typography component="h1" variant="h6">
-          Step 1: Enter the Address of the wallet you will be signing the txn
-          with, this address is the address that you have opted to use for the
-          multi-sig wallet
+        <Typography component="p" className={classes.paragraph}>
+          <strong>Step 1</strong>: Enter the Address of the wallet you will be
+          signing the txn with, this address is the address that you have opted
+          to use for the multi-sig wallet
         </Typography>
-        <Typography component="h1" variant="h6">
-          Step 2: Enter the ID that has been passed to you for example:
-          DeployContract1, this will query the backend and return you the TXN to
-          sign
+
+        <Typography component="p" className={classes.paragraph}>
+          <strong>Step 2</strong>: Enter the ID that has been passed to you for
+          example: DeployContract1, this will query the backend and return you
+          the TXN to sign
         </Typography>
+
         <form className={classes.form} onSubmit={onSubmit}>
           <div>
             <TextField
