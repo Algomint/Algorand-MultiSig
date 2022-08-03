@@ -165,8 +165,8 @@ function App() {
         </Typography>
         <form className={classes.form} onSubmit={onSubmit}>
           <div>
-            <Typography component="h1" variant="h6">
-              Step 1: Choose total of signing addresses
+            <Typography component="h1" variant="h6" className={classes.paragraph}>
+            <strong>Step 1</strong>: Choose total of signing addresses
             </Typography>
             <TextField
               {...register("totalAddr", { required: true, min: 1 })}
@@ -185,12 +185,8 @@ function App() {
                 Enter a number of addresses to add to multisign account
               </div>
             )}
-            <div>
-              valores
-              {totalAddr}
-            </div>
-            <Typography component="h1" variant="h6">
-              Step 2: Choose threshold
+            <Typography component="h1" variant="h6"  className={classes.paragraph}>
+              <strong>Step 2</strong>: Choose threshold
             </Typography>
             <TextField
               {...register("threshold", {
@@ -207,8 +203,13 @@ function App() {
               InputProps={{ inputProps: { min: 1, max: totalAddr } }}
               fullWidth
             />
-            <Typography component="h1" variant="h6">
-              Step 3: Choose up to {totalAddr} signing addresses from AlgoSigner
+            {errors.threshold && (
+              <div className="error">
+                Enter a number of threshold addresses
+              </div>
+            )}
+            <Typography component="h1" variant="h6" className={classes.paragraph}>
+            <strong>Step 3</strong>: Choose up to {totalAddr} signing addresses from AlgoSigner
               Wallet
             </Typography>
             <Controller
@@ -258,10 +259,9 @@ function App() {
               control={control}
               rules={{ required: true }}
             />
-
             {totalAddr - walletAddrs.length > 0 && (
-              <Typography component="h1" variant="h6">
-                Step 4: Enter remaining {totalAddr - walletAddrs.length}{" "}
+              <Typography component="h1" variant="h6" className={classes.paragraph}>
+                <strong>Step 4</strong>: Enter remaining {totalAddr - walletAddrs.length}{" "}
                 addresses manualy
               </Typography>
             )}

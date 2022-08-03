@@ -24,7 +24,7 @@ type menuItem = {
 
 const pages: menuItem[] = [
   { name: "Generate Multisign address", path: "/genMulti" },
-  { name: "Generate RawTxn", path: "/rawTxn" },
+  { name: "Generate RawTxn", path: "/genRawTxn" },
   { name: "SignTxt", path: "/signTxn" },
 ];
 
