@@ -34,7 +34,6 @@ function App() {
   );
 }
 
-<<<<<<< HEAD
 const PrivateRoutes = () => {
   let auth = useWallet()
 return (
@@ -44,6 +43,3 @@ return (
 
 
 export default App;
-=======
-export default App;
->>>>>>> c2651c764c22240f5502e3fdcc705522b0e1e485

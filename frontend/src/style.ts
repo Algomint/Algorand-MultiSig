@@ -5,6 +5,15 @@ const useStyles = makeStyles((theme) => ({
     navbar:{
         background: 'linear-gradient(45deg, #000000 30%, #606060 90%)',
     },
+    heading: {
+      fontSize: "30px",
+      fontWeight: "bold",
+      marginBottom: "22px",
+    },
+    paragraph: {
+      marginBottom: theme.spacing(4),
+      fontSize: "18px",
+    },
     paper: {
         marginTop: theme.spacing(10),
         display: 'flex',
