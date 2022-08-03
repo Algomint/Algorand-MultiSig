@@ -9,9 +9,12 @@ import Container from "@material-ui/core/Container";
 import { AppService } from "../services/app.service";
 import "../App.css";
 import useStyles from "../style";
+<<<<<<< HEAD
 import initiateAlgodClient from "../utils/algodClient";
 import base64ToArrayBuffer from "../utils/decode";
 import algosdk from "algosdk";
+=======
+>>>>>>> c2651c764c22240f5502e3fdcc705522b0e1e485
 
 declare const AlgoSigner: any;
 
@@ -31,17 +34,29 @@ function App() {
   const { Buffer } = buffer;
   if (!window.Buffer) window.Buffer = Buffer;
 
+<<<<<<< HEAD
   let account1 = "HZILGCZCVFKICCS4J2VUQVMNTAZR2URCGCAKRBBK475BI5E7CMLWDH6KTM";
   let account2 = "GLNQZSOM5JIYWUIMZPODJJVML367WFLPTEYFBVJL2B64L4ZJSEI2AO2TV4";
   let account3 = "CW52DW2WCNQ3U5HLVYDZRE25AS7VTEXZNBIDMLU5PAWVX6H7T6UGNK5PJE";
+=======
+  let account1 = "BBATM3HP22USXHXNKAMYGWQAK4CJFTKQFNTHSFQMDWL6LZGKORYPBDC73I";
+  let account2 = "4VCA7W755EM5HBHSH3ZKVGV64MBE7S6OSNZUYGUIF45YX2NMIHWHSKYIEA";
+>>>>>>> c2651c764c22240f5502e3fdcc705522b0e1e485
 
   const mparams = {
     version: 1,
     threshold: 2,
+<<<<<<< HEAD
     addrs: [account1, account2, account3],
   };
 
   const onSubmit = handleSubmit(async (data) => {
+=======
+    addrs: [account1, account2],
+  };
+
+  const onSubmit = handleSubmit(async data => {
+>>>>>>> c2651c764c22240f5502e3fdcc705522b0e1e485
     alert(JSON.stringify(data));
 
     const appService = new AppService();
@@ -56,6 +71,7 @@ function App() {
     let signer = data.signerAddr;
 
     let base64MultisigTx = getResponse.txn.raw_transaction;
+<<<<<<< HEAD
     //[REMOVE] get info
     
     const b = base64ToArrayBuffer(base64MultisigTx);
@@ -72,6 +88,9 @@ function App() {
     console.log(accountInfo);
     
     //[REMOVE] end
+=======
+
+>>>>>>> c2651c764c22240f5502e3fdcc705522b0e1e485
     console.log(base64MultisigTx);
 
     let signedTxs = await AlgoSigner.signTxn([
@@ -96,20 +115,22 @@ function App() {
     <Container component="main" maxWidth="xs">
       <CssBaseline />
       <div className={classes.paper}>
-        <Typography component="h1" variant="h5">
+        <Typography component="h1" variant="h2" className={classes.heading}>
           Multi-Sig Txn Signer
         </Typography>
 
-        <Typography component="h1" variant="h6">
-          Step 1: Enter the Address of the wallet you will be signing the txn
-          with, this address is the address that you have opted to use for the
-          multi-sig wallet
+        <Typography component="p" className={classes.paragraph}>
+          <strong>Step 1</strong>: Enter the Address of the wallet you will be
+          signing the txn with, this address is the address that you have opted
+          to use for the multi-sig wallet
         </Typography>
-        <Typography component="h1" variant="h6">
-          Step 2: Enter the ID that has been passed to you for example:
-          DeployContract1, this will query the backend and return you the TXN to
-          sign
+
+        <Typography component="p" className={classes.paragraph}>
+          <strong>Step 2</strong>: Enter the ID that has been passed to you for
+          example: DeployContract1, this will query the backend and return you
+          the TXN to sign
         </Typography>
+
         <form className={classes.form} onSubmit={onSubmit}>
           <div>
             <TextField

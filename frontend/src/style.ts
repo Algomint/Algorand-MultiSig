@@ -1,5 +1,5 @@
-import './App.css';
-import { makeStyles } from '@material-ui/core/styles';
+import "./App.css";
+import { makeStyles } from "@material-ui/core/styles";
 
 const useStyles = makeStyles((theme) => ({
     navbar:{
@@ -37,6 +37,8 @@ const useStyles = makeStyles((theme) => ({
         height: 48,
         padding: '0 30px',
     },
-}));
+  }
+    ));
+
 
 export default useStyles;

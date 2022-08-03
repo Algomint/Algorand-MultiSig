@@ -1,5 +1,4 @@
 import React from 'react';
-import SignTxn from './pages/signTxn'
 import WalletAuth from './pages/walletAuth'
 import GenerateMultiSignAddr from './pages/generateMultiSignAddr'
 import {
@@ -12,6 +11,7 @@ import {
 import {ProvideAuth, useWallet} from "./hooks/walletHook"
 import DenseMenu from './components/menu';
 
+import SignTxn from "./pages/signTxn";
 
 function App() {
   return (
@@ -29,12 +29,12 @@ function App() {
       
       
       </Routes>
-
     </Router>
     </ProvideAuth>
   );
 }
 
+<<<<<<< HEAD
 const PrivateRoutes = () => {
   let auth = useWallet()
 return (
@@ -44,3 +44,6 @@ return (
 
 
 export default App;
+=======
+export default App;
+>>>>>>> c2651c764c22240f5502e3fdcc705522b0e1e485
