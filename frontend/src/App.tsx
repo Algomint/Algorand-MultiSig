@@ -1,6 +1,8 @@
 import React from 'react';
 import WalletAuth from './pages/walletAuth'
 import GenerateMultiSignAddr from './pages/generateMultiSignAddr'
+import SignTxn from "./pages/signTxn";
+import GenerateRawTxn from "./pages/generateRawTxn"
 import {
   BrowserRouter as Router,
   Route,
@@ -11,7 +13,6 @@ import {
 import {ProvideAuth, useWallet} from "./hooks/walletHook"
 import DenseMenu from './components/menu';
 
-import SignTxn from "./pages/signTxn";
 
 function App() {
   return (
@@ -23,7 +24,7 @@ function App() {
         
         <Route element={<PrivateRoutes />}>
         <Route path="/genMulti" element={<GenerateMultiSignAddr  />} />
-        <Route path="/genRawTxn" element={<GenerateMultiSignAddr  />} />
+        <Route path="/genRawTxn" element={<GenerateRawTxn  />} />
         <Route path="/signTxn" element={<SignTxn />} />
         </Route>
       

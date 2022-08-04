@@ -288,18 +288,19 @@ function App() {
             >
               Generate multiSign address
             </Button>
-            <Button
+          </div>
+        </form>
+        <Button
               className={classes.submit}
               color="primary"
               variant="contained"
+              onClick={() => nav("/genRawTxn")}
               fullWidth
               type="button"
               endIcon={nextIcon}
             >
               Skip to generate raw transaction
             </Button>
-          </div>
-        </form>
         <DialogMultiSig
           open={open}
           handleClose={handleClose}

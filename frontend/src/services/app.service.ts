@@ -29,7 +29,7 @@ export class AppService {
     return await response.json();
   }
 
-  public async addRawTxn(txid: any, txn: any, numSign: any) {
+  public async addRawTxn(txid: string, txn: string, numSign: number) {
     const response = await fetch(
       `http://localhost:8081/ms-multisig-db/v1/addrawtxn`,
       {
@@ -38,7 +38,7 @@ export class AppService {
         body: JSON.stringify({
           txn_id: txid,
           transaction: txn,
-          number_of_signs_required: numSign,
+          number_of_signs_required: Number(numSign),
         }),
       }
     );
