@@ -223,7 +223,7 @@ function App() {
 
   const handleClose = () => {
     setOpen(false);
-    nav("/genRawTxn");
+    nav("/signTxn");
   };
 
   return (
@@ -438,7 +438,7 @@ function App() {
               fullWidth
               type="submit"
             >
-              Generate multiSign address
+              Generate Raw Transaction
             </Button>
           </div>
         </form>

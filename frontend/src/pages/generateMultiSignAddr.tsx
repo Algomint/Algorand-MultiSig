@@ -20,7 +20,7 @@ import { useNavigate } from "react-router-dom";
 
 declare const AlgoSigner: any;
 
-type AddrType = {
+export type AddrType = {
   address: string;
 };
 
@@ -169,14 +169,14 @@ function App() {
             <strong>Step 1</strong>: Choose total of signing addresses
             </Typography>
             <TextField
-              {...register("totalAddr", { required: true, min: 1 })}
+              {...register("totalAddr", { required: true, min: 1, valueAsNumber:true })}
               id="totalAddr"
               label="Number of signing addresess"
               type="number"
               variant="outlined"
               autoFocus
               margin="normal"
-              defaultValue="3"
+              defaultValue={3}
               InputProps={{ inputProps: { min: 1, max: 99 } }}
               fullWidth
             />
@@ -193,11 +193,13 @@ function App() {
                 required: true,
                 min: 1,
                 max: totalAddr,
+                valueAsNumber:true
               })}
-              id="totalAddr"
-              label="Number of signing addresess"
+              id="threshold"
+              label="Number of threshold addresess"
               type="number"
               variant="outlined"
+              defaultValue={2}
               autoFocus
               margin="normal"
               InputProps={{ inputProps: { min: 1, max: totalAddr } }}
@@ -230,7 +232,7 @@ function App() {
                     walletAddrs.length >= totalAddr ? true : false
                   }
                   getOptionLabel={(option) =>
-                    option.address.slice(1, 6) + "..."
+                    option.address.slice(0, 6) + "..."
                   }
                   renderOption={(props, option, { selected }) => (
                     <li {...props}>

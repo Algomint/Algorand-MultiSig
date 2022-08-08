@@ -1,7 +1,7 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import TextField from "@material-ui/core/TextField";
 import buffer from "buffer";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import Button from "@material-ui/core/Button";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import Typography from "@material-ui/core/Typography";
@@ -9,46 +9,71 @@ import Container from "@material-ui/core/Container";
 import { AppService } from "../services/app.service";
 import "../App.css";
 import useStyles from "../style";
-//import initiateAlgodClient from "../utils/algodClient";
-//import base64ToArrayBuffer from "../utils/decode";
-//import algosdk from "algosdk";
+import Autocomplete from "@mui/material/Autocomplete";
 
 declare const AlgoSigner: any;
 
-type txnArgs = {
+type signArgs = {
   txnID: string;
-  signerAddr: string;
+  signerAddr: AddrType;
+};
+
+type AddrType = {
+  address: string;
 };
 
 function App() {
   const {
+    control,
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<txnArgs>();
+  } = useForm<signArgs>({
+    mode: "onChange",
+    defaultValues: {
+      txnID: "",
+      signerAddr: {
+        address: "",
+      },
+    },
+  });
+
   const classes = useStyles();
+  const [addrs, setAddrs] = useState<AddrType[]>([]);
 
   const { Buffer } = buffer;
   if (!window.Buffer) window.Buffer = Buffer;
 
-  let account1 = "HZILGCZCVFKICCS4J2VUQVMNTAZR2URCGCAKRBBK475BI5E7CMLWDH6KTM";
-  let account2 = "GLNQZSOM5JIYWUIMZPODJJVML367WFLPTEYFBVJL2B64L4ZJSEI2AO2TV4";
-  let account3 = "CW52DW2WCNQ3U5HLVYDZRE25AS7VTEXZNBIDMLU5PAWVX6H7T6UGNK5PJE";
+  useEffect(() => {
+    AlgoSigner.connect()
+      .then(() => {
+        AlgoSigner.accounts({
+          ledger: "TestNet",
+        })
+          .then((d: AddrType[]) => {
+            setAddrs(d);
+          })
+          .catch((e: Error) => Promise.reject(e));
+      })
+      .catch((e: Error) => Promise.reject(e));
+  }, []);
 
-  const mparams = {
-    version: 1,
-    threshold: 2,
-    addrs: [account1, account2, account3],
-  };
-
-  const onSubmit = handleSubmit(async (data) => {
-    alert(JSON.stringify(data));
+  const onSubmit = handleSubmit(async data => {
+    //alert(JSON.stringify(data));
 
     const appService = new AppService();
 
     let txnID = data.txnID;
 
-    const getResponse = await appService.getRawTxn(txnID);
+    const getResponse = await appService.getRawTxn(txnID).catch((e: Error) => {
+      alert("Cannot get RawTxn from backend. Error: " + e.message);
+      console.error(e);
+    });
+
+    if (getResponse === undefined) {
+      return;
+    }
+
     console.log(getResponse);
 
     await AlgoSigner.connect();
@@ -57,6 +82,17 @@ function App() {
 
     let base64MultisigTx = getResponse.txn.raw_transaction;
     console.log(base64MultisigTx);
+
+    //Get data from localstorage
+    let mparams = { version: 1, threshold: 2, addrs: [] };
+    const lmparams = localStorage.getItem("mparams");
+    if (lmparams) {
+      mparams = JSON.parse(lmparams);
+    }else{
+      alert("transaction params not found. Did you generate multisig address?")
+      return;
+    }
+    console.log(mparams);
 
     let signedTxs = await AlgoSigner.signTxn([
       {
@@ -73,6 +109,12 @@ function App() {
     console.log(txID);
 
     const response = await appService.addSignedTxn(signer, signedTxn, txnID);
+
+    if(response && response.success){
+      alert("Signed txn added to backend!")
+    }else{
+      alert("Error from backend: " + JSON.stringify(response))
+    }
     console.log(response);
   });
 
@@ -83,34 +125,53 @@ function App() {
         <Typography component="h1" variant="h2" className={classes.heading}>
           Multi-Sig Txn Signer
         </Typography>
-
         <Typography component="p" className={classes.paragraph}>
           <strong>Step 1</strong>: Enter the Address of the wallet you will be
           signing the txn with, this address is the address that you have opted
           to use for the multi-sig wallet
         </Typography>
-
         <Typography component="p" className={classes.paragraph}>
           <strong>Step 2</strong>: Enter the ID that has been passed to you for
           example: DeployContract1, this will query the backend and return you
           the TXN to sign
         </Typography>
-
         <form className={classes.form} onSubmit={onSubmit}>
           <div>
-            <TextField
-              {...register("signerAddr", { required: true })}
+            <Controller
+              render={({ field: { onChange, value } }) => (
+                <Autocomplete
+                  //{...props}
+                  {...register("signerAddr", { required: true })}
+                  onChange={(event, item) => {
+                    onChange(item);
+                  }}
+                  value={value}
+                  id="checkboxes-addrs"
+                  options={addrs}
+                  freeSolo={true}
+                  disableCloseOnSelect
+                  getOptionLabel={(option: AddrType) =>
+                    option.address.slice(0, 6) + "..."
+                  }
+                  renderOption={(props, option, { selected }) => (
+                    <li {...props}>{option.address}</li>
+                  )}
+                  renderInput={params => (
+                    <TextField
+                      {...params}
+                      label="Addreses from wallet"
+                      placeholder="Wallet address"
+                      variant="outlined"
+                      fullWidth
+                      margin="normal"
+                    />
+                  )}
+                />
+              )}
               name="signerAddr"
-              margin="normal"
-              label="signerAddr to sign"
-              autoFocus
-              variant="outlined"
-              fullWidth
-              type="text"
+              control={control}
+              rules={{ required: true }}
             />
-            {errors.signerAddr && (
-              <div className="error"> Enter signerAddr</div>
-            )}
           </div>
           <div>
             <TextField

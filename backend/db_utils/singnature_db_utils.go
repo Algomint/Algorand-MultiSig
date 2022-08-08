@@ -36,6 +36,14 @@ func AddRawTxn(txn model.RawTxn) error {
 	return nil
 }
 
+func AddSignersAddrs(txn []model.SignerAddress) error {
+	resp := db.DbConnection.Create(&txn)
+	if resp.Error != nil {
+		return resp.Error
+	}
+	return nil
+}
+
 func AddSignedTxn(txn model.SignedTxn) error {
 
 	resp := db.DbConnection.Create(&txn)

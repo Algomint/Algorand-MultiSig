@@ -11,6 +11,18 @@ import (
 
 func CreateRawTransaction(txn dto.RawTxn) (dto.Response, error) {
 
+	signersAddrs := []model.SignerAddress{}
+
+	for _, addr := range txn.SignersAddreses {
+		obj := model.SignerAddress{
+			SignTxnId:     txn.TxnId,
+			SignerAddress: addr,
+		}
+		signersAddrs = append(signersAddrs, obj)
+	}
+
+	fmt.Printf("%+v", signersAddrs)
+
 	rawTxn := model.RawTxn{RawTransaction: txn.Transaction, TxnId: txn.TxnId, NumberOfSignsRequired: txn.NumberOfSignsRequired}
 
 	err := db_utils.AddRawTxn(rawTxn)
@@ -18,6 +30,13 @@ func CreateRawTransaction(txn dto.RawTxn) (dto.Response, error) {
 		logger.Error("Error in AddRawTxn with the message : ", zap.Error(err))
 		return dto.Response{}, err
 	}
+
+	err = db_utils.AddSignersAddrs(signersAddrs)
+	if err != nil {
+		logger.Error("Error in AddSignersAddrs with the message : ", zap.Error(err))
+		return dto.Response{}, err
+	}
+
 	return dto.Response{Success: true, Message: "Transaction Added"}, nil
 }
 
