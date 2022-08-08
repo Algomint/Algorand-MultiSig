@@ -24,3 +24,9 @@ type GetRawTxnResponse struct {
 	Message string       `json:"message"`
 	Txn     model.RawTxn `json:"txn"`
 }
+
+type GetRawTxnSignersAddrsResponse struct {
+	Success bool                  `json:"success"`
+	Message string                `json:"message"`
+	Addrs   []model.SignerAddress `json:"signersAddrs"`
+}

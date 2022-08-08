@@ -17,7 +17,7 @@ func MergeTransactions(txnId string) ([]byte, string, error) {
 	}
 
 	var mergedSignedTxns [][]byte
-	for index, _ := range response.Txn {
+	for index := range response.Txn {
 		decodedTxn, err := utils.Base64Decode(response.Txn[index].SignedTransaction)
 		if err != nil {
 			logger.Error("Error Found in Decoding the transaction with the error message ", zap.Error(err))

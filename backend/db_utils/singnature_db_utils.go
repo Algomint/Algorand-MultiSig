@@ -128,6 +128,31 @@ func GetRawTxnOnTxnId(txnId string) (dto.GetRawTxnResponse, error) {
 	}, nil
 }
 
+func GetRawTxnSignersOnTxnId(txnId string) (dto.GetRawTxnSignersAddrsResponse, error) {
+	var signersAddrs []model.SignerAddress
+	tx := db.DbConnection.Where("sign_txn_id = ?", txnId).Find(&signersAddrs)
+
+	if tx.Error != nil {
+		return dto.GetRawTxnSignersAddrsResponse{
+			Success: false,
+			Message: tx.Error.Error(),
+		}, tx.Error
+	}
+
+	if tx.RowsAffected == 0 {
+		return dto.GetRawTxnSignersAddrsResponse{
+			Message: "No Record Found",
+			Success: false,
+		}, tx.Error
+	}
+
+	return dto.GetRawTxnSignersAddrsResponse{
+		Success: true,
+		Message: "Txn Found",
+		Addrs:   signersAddrs,
+	}, nil
+}
+
 func GetCurrentNumberOfSignature(txnId string) (int64, error) {
 	var rawTxn model.RawTxn
 	tx := db.DbConnection.Where("txn_id = ?", txnId).Find(&rawTxn)

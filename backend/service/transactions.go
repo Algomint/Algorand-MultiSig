@@ -2,11 +2,12 @@ package service
 
 import (
 	"fmt"
-	"go.uber.org/zap"
 	"multisigdb-svc/db_utils"
 	"multisigdb-svc/dto"
 	"multisigdb-svc/model"
 	"multisigdb-svc/utils"
+
+	"go.uber.org/zap"
 )
 
 func CreateRawTransaction(txn dto.RawTxn) (dto.Response, error) {
@@ -21,11 +22,15 @@ func CreateRawTransaction(txn dto.RawTxn) (dto.Response, error) {
 		signersAddrs = append(signersAddrs, obj)
 	}
 
-	fmt.Printf("%+v", signersAddrs)
+	isValidRawtxn, err := utils.ValidateRawTxnAgainsParameters(txn.TxnId, txn.Transaction, uint8(txn.NumberOfSignsRequired), txn.Version, txn.SignersAddreses)
 
-	rawTxn := model.RawTxn{RawTransaction: txn.Transaction, TxnId: txn.TxnId, NumberOfSignsRequired: txn.NumberOfSignsRequired}
+	if !isValidRawtxn {
+		return dto.Response{}, err
+	}
 
-	err := db_utils.AddRawTxn(rawTxn)
+	rawTxn := model.RawTxn{RawTransaction: txn.Transaction, TxnId: txn.TxnId, NumberOfSignsRequired: txn.NumberOfSignsRequired, Version: txn.Version}
+	err = db_utils.AddRawTxn(rawTxn)
+
 	if err != nil {
 		logger.Error("Error in AddRawTxn with the message : ", zap.Error(err))
 		return dto.Response{}, err

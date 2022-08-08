@@ -32,9 +32,10 @@ func CreateTable(db *gorm.DB) error {
 
 	const rawQueryCreateTxn = "CREATE TABLE IF NOT EXISTS RawTransaction (" +
 		"raw_transaction TEXT NOT NULL, " +
-		"txn_id TEXT PRIMARY KEY NOT NULL," +
-		"number_of_signs_required INTEGER NOT NULL," +
-		"status TEXT)"
+		"txn_id TEXT PRIMARY KEY NOT NULL, " +
+		"number_of_signs_required INTEGER NOT NULL, " +
+		"version required INTEGER NOT NULL, " +
+		"status TEXT );"
 
 	tx = db.Exec(rawQueryCreateTxn)
 	if tx.Error != nil {
@@ -47,7 +48,7 @@ func CreateTable(db *gorm.DB) error {
 		"signer_address TEXT, " +
 		"CONSTRAINT fk_txn_id " +
 		"FOREIGN KEY (sign_txn_id) " +
-		"REFERENCES RawTransaction(txn_id) )"
+		"REFERENCES RawTransaction(txn_id) );"
 
 	tx = db.Exec(rawQueryCreateSignerAddress)
 	if tx.Error != nil {

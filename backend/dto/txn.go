@@ -7,8 +7,9 @@ type SignedTxn struct {
 }
 
 type RawTxn struct {
-	Transaction           string `json:"transaction" binding:"required"`
-	TxnId                 string `json:"txn_id" binding:"required"`
-	NumberOfSignsRequired int64  `json:"number_of_signs_required" binding:"required"`
-	SignersAddreses    []string  `json:"signers_addresses" binding:"required"`
+	Transaction           string   `json:"transaction" binding:"required"`
+	TxnId                 string   `json:"txn_id" binding:"required"`
+	NumberOfSignsRequired int64    `json:"number_of_signs_required" binding:"required"`
+	Version               uint8    `json:"version" binding:"required"`
+	SignersAddreses       []string `json:"signers_addresses" binding:"required"`
 }
