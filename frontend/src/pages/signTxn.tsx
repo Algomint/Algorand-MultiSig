@@ -88,34 +88,50 @@ function App() {
     const lmparams = localStorage.getItem("mparams");
     if (lmparams) {
       mparams = JSON.parse(lmparams);
-    }else{
-      alert("transaction params not found. Did you generate multisig address?")
+    } else {
+      alert("transaction params not found. Did you generate multisig address?");
       return;
     }
-    console.log(mparams);
 
     let signedTxs = await AlgoSigner.signTxn([
       {
         txn: base64MultisigTx,
         msig: mparams,
-        signers: [signer],
+        signers: [signer.address],
       },
-    ]);
+    ]).catch((e: any) => {
+      console.error("Error from ALgoSigner signTxn with parameters:");
+      console.error(
+        JSON.stringify({
+          txn: base64MultisigTx,
+          msig: mparams,
+          signers: [signer.address],
+        })
+      );
+      console.error(e);
+    });
 
-    let txID = signedTxs[0].txID;
-    let signedTxn = signedTxs[0].blob;
+    try {
+      let txID = signedTxs[0].txID;
+      let signedTxn = signedTxs[0].blob;
 
-    console.log(signedTxn);
-    console.log(txID);
+      console.log(signedTxn);
+      console.log(txID);
+      const response = await appService.addSignedTxn(
+        signer.address,
+        signedTxn,
+        txnID
+      );
 
-    const response = await appService.addSignedTxn(signer, signedTxn, txnID);
-
-    if(response && response.success){
-      alert("Signed txn added to backend!")
-    }else{
-      alert("Error from backend: " + JSON.stringify(response))
+      if (response && response.success) {
+        alert("Signed txn added to backend!");
+      } else {
+        alert("Error from backend: " + JSON.stringify(response));
+      }
+      console.log(response);
+    } catch (e) {
+      console.error(e);
     }
-    console.log(response);
   });
 
   return (

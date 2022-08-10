@@ -11,7 +11,7 @@ import (
 )
 
 func CreateRawTransaction(txn dto.RawTxn) (dto.Response, error) {
-
+	logger.Info(fmt.Sprintf("received txn: %+v " , txn))
 	signersAddrs := []model.SignerAddress{}
 
 	for _, addr := range txn.SignersAddreses {

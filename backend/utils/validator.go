@@ -35,8 +35,6 @@ func ValidateRawTxnAgainsParameters(txnId, rawTxnBase64 string, threshold, versi
 		return false, err
 	}
 	
-	//logger.Info(fmt.Sprintf("Recieved Raw Transaction: %+v.", unsignedTxRaw.Sender))
-
 	if err != nil {
 		logger.Error("Error Found retrieving Signers Adrrs ", zap.Error(err))
 		return false, err

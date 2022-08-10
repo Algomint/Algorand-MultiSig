@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import TextField from "@material-ui/core/TextField";
-import buffer from "buffer";
-//import { Controller, useForm, useWatch, useFieldArray } from "react-hook-form";
+import { Buffer } from "buffer";
 import { useForm } from "react-hook-form";
 import Button from "@material-ui/core/Button";
 import CssBaseline from "@material-ui/core/CssBaseline";
@@ -9,22 +8,17 @@ import Typography from "@material-ui/core/Typography";
 import Container from "@material-ui/core/Container";
 import "../App.css";
 import useStyles from "../style";
-//import Checkbox from "@mui/material/Checkbox";
-//import Autocomplete from "@mui/material/Autocomplete";
-//import CheckBoxOutlineBlankIcon from "@mui/icons-material/CheckBoxOutlineBlank";
-//import CheckBoxIcon from "@mui/icons-material/CheckBox";
-//import algosdk from "algosdk";
 import type { mparamsType } from "../components/multiSigDialog";
 import NavigateNextIcon from "@mui/icons-material/NavigateNext";
-import initiateAlgodClient from "../utils/algodClient";
+import initiateAlgodClient, {
+  checkMultiSigAddrFunds,
+} from "../utils/algodClient";
 import { useNavigate } from "react-router-dom";
 import algosdk from "algosdk";
 import byteArrayToBase64 from "../utils/encode";
 import { AppService } from "../services/app.service";
 import RawTxnDialog from "../components/rawTxnDialog";
-//import { useNavigate } from "react-router-dom";
-
-//declare const AlgoSigner: any;
+import base64ToArrayBuffer from "../utils/decode";
 
 type rawTxnArgs = {
   creator: string;
@@ -103,45 +97,38 @@ function App() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const { Buffer } = buffer;
+  const [open, setOpen] = useState(false);
+  const [txnId, setTxnIdState] = useState("");
+  const [rawTxn, setRawTxn] = useState<algosdk.Transaction | undefined>(
+    undefined
+  );
+
+  //const { Buffer } = buffer;
   if (!window.Buffer) window.Buffer = Buffer;
 
   //const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
   //const checkedIcon = <CheckBoxIcon fontSize="small" />;
   const nextIcon = <NavigateNextIcon />;
 
-  async function checkMultiSigAddr(addr: string): Promise<boolean> {
+  async function generateRawTxnFromFormData(data: rawTxnArgs) {
     const algodClient = await initiateAlgodClient();
-    let accountInfo = await algodClient.accountInformation(addr).do();
-    console.log("Account balance: %d microAlgos", accountInfo.amount);
-    if (accountInfo.amount > 1) {
-      return true;
-    }
+    const params = await algodClient.getTransactionParams().do();
 
-    return false;
-  }
+    setTxnIdState(data.txnId);
 
-  async function generateRawTxn(msig_addr: string, data: rawTxnArgs) {
-    const algodClient = await initiateAlgodClient();
-    setTxnId(data.txnId);
-
-    let params = await algodClient.getTransactionParams().do();
-
-    const creator = msig_addr;
+    const creator = data.creator;
     const defaultFrozen = data.defaultFrozen;
     const unitName = data.unitName;
     const assetName = data.assetName;
     const assetURL = data.assetURL;
-    let note = new Uint8Array(Buffer.from(data.note, "utf8"));
-    const manager = msig_addr;
-    const reserve = msig_addr;
-    const freeze = msig_addr;
-    const clawback = msig_addr;
-    let assetMetadataHash = data.assetMetadataHash;
+    const note = new Uint8Array(Buffer.from(data.note, "utf8"));
+    const manager = data.manager;
+    const reserve = data.reserve;
+    const freeze = data.freeze;
+    const clawback = data.clawback;
+    const assetMetadataHash = data.assetMetadataHash;
     const total = data.total;
     const decimals = data.decimals;
-
-    console.log(typeof data.decimals);
 
     const txn = algosdk.makeAssetCreateTxnWithSuggestedParams(
       creator,
@@ -160,30 +147,23 @@ function App() {
       params
     );
 
-    let binaryMultisigTx = txn.toByte();
-    let base64MultisigTx = byteArrayToBase64(binaryMultisigTx);
-    console.log("txn base 64");
-    console.log(base64MultisigTx);
-
-    function _base64ToArrayBuffer(base64: string) {
-      var binary_string = atob(base64);
-      var len = binary_string.length;
-      var bytes = new Uint8Array(len);
-      for (var i = 0; i < len; i++) {
-        bytes[i] = binary_string.charCodeAt(i);
-      }
-      return bytes;
-    }
-
-    const b = _base64ToArrayBuffer(base64MultisigTx);
+    const binaryMultisigTx = txn.toByte();
+    const base64MultisigTx = byteArrayToBase64(binaryMultisigTx);
+    console.log("base64 rawTxn: " + base64MultisigTx);
+    const b = base64ToArrayBuffer(base64MultisigTx);
 
     const txnRaw = algosdk.decodeUnsignedTransaction(b);
     setRawTxn(txnRaw);
-    console.log(txnRaw);
-
+  
     const appService = new AppService();
     const response = await appService
-      .addRawTxn(data.txnId, base64MultisigTx, mparams.threshold)
+      .addRawTxn(
+        data.txnId,
+        base64MultisigTx,
+        mparams.threshold,
+        mparams.version,
+        mparams.addrs
+      )
       .catch((e: Error) => {
         alert(
           "Backend error (did you run `go run ./cmd/main.go`?) \n message: " +
@@ -195,11 +175,12 @@ function App() {
   }
 
   const onSubmit = handleSubmit(async data => {
-    const r = await checkMultiSigAddr(data.creator);
+    const r = await checkMultiSigAddrFunds(data.creator);
     if (r) {
       //alert(JSON.stringify(data));
-      const resp = await generateRawTxn(data.creator, data);
+      const resp = await generateRawTxnFromFormData(data);
       if (resp && resp.success) {
+        //setTxnIdState(data.txnId);
         handleClickOpen();
       }
 
@@ -210,12 +191,6 @@ function App() {
       alert("Multisig account has not been founded");
     }
   });
-
-  const [open, setOpen] = useState(false);
-  const [txnId, setTxnId] = useState("");
-  const [rawTxn, setRawTxn] = useState<algosdk.Transaction | undefined>(
-    undefined
-  );
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -361,6 +336,17 @@ function App() {
               {...register("clawback", { required: true })}
               id="nft clawback"
               label="NFT clawback"
+              type="text"
+              variant="outlined"
+              autoFocus
+              margin="normal"
+              defaultValue=""
+              fullWidth
+            />
+            <TextField
+              {...register("freeze", { required: true })}
+              id="nft freeze"
+              label="NFT freeze"
               type="text"
               variant="outlined"
               autoFocus
