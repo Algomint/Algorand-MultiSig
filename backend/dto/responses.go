@@ -30,3 +30,9 @@ type GetRawTxnSignersAddrsResponse struct {
 	Message string                `json:"message"`
 	Addrs   []model.SignerAddress `json:"signersAddrs"`
 }
+
+type GetTxnIdsResponse struct {
+	Success bool     `json:"success"`
+	Message string   `json:"message"`
+	TxnIds  []string `json:"txnids"`
+}

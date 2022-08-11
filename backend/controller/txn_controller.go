@@ -80,12 +80,30 @@ func GetSignedTxn(ctx *gin.Context) {
 func GetRawTxn(ctx *gin.Context) {
 	txnId := ctx.Query("id")
 	if txnId == "" {
-		resp := dto.Response{Success: false, Message: "Failed to process request send the valid data"}
+		resp := dto.Response{Success: false, Message: "Failed to process request send valid id"}
 		ctx.JSON(http.StatusBadRequest, resp)
 		return
 	}
 
 	resp, err := service.GetRawTransaction(txnId)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, resp)
+		return
+	}
+
+	ctx.JSON(http.StatusOK, resp)
+}
+
+func GetTxnIdsFromAddr(ctx *gin.Context) {
+	addr := ctx.Query("addr")
+
+	if addr == "" {
+		resp := dto.Response{Success: false, Message: "Failed to process request send valid addr"}
+		ctx.JSON(http.StatusBadRequest, resp)
+		return
+	}
+
+	resp, err := service.GetTxnIdsWithAddr(addr)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, resp)
 		return

@@ -129,3 +129,7 @@ func GetSignedTransaction(txnId string) (dto.GetSingedTxnResponse, error) {
 func GetRawTransaction(txnId string) (dto.GetRawTxnResponse, error) {
 	return db_utils.GetRawTxnOnTxnId(txnId)
 }
+
+func GetTxnIdsWithAddr(addr string) (dto.GetTxnIdsResponse, error) {
+	return db_utils.GetTxnIdOnAddr(addr)
+}

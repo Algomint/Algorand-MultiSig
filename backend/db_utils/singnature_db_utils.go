@@ -1,9 +1,12 @@
 package db_utils
 
 import (
+	"fmt"
 	"multisigdb-svc/db"
 	"multisigdb-svc/dto"
 	"multisigdb-svc/model"
+
+	"github.com/algorand/go-algorand-sdk/types"
 )
 
 func UpdateNumberOfSignsRequired(txnId string) bool {
@@ -201,4 +204,54 @@ func UpdateStatusOfTransactionToDone(txn string) error {
 		return err
 	}
 	return nil
+}
+
+func GetTxnIdOnAddr(addr string) (dto.GetTxnIdsResponse, error) {
+
+	_, err := isValidAddress(addr)
+
+	if err != nil {
+		return dto.GetTxnIdsResponse{
+			Success: false,
+			Message: "Error invalid address",
+		}, err
+	}
+
+	var signers []model.SignerAddress
+	err = db.DbConnection.Where("signer_address = ?", addr).Find(&signers).Error
+	if err != nil {
+		return dto.GetTxnIdsResponse{
+			Success: false,
+			Message: "Error getting txnIds wrong signer address?",
+		}, err
+	}
+
+	if len(signers) == 0 {
+		return dto.GetTxnIdsResponse{
+			Success: true,
+			Message: "No txnid found",
+			TxnIds: []string{},
+		}, nil
+	}
+
+	var addrTxnIds []string
+
+	for _, e := range signers {
+		addrTxnIds = append(addrTxnIds, e.SignTxnId)
+	}
+
+	return dto.GetTxnIdsResponse{
+		Success: true,
+		Message: fmt.Sprintf("Valid txnIds for address %s found", addr),
+		TxnIds:  addrTxnIds,
+	}, nil
+
+}
+
+func isValidAddress(addr string) (bool, error) {
+	_, err := types.DecodeAddress(addr)
+	if err != nil {
+		return false, err
+	}
+	return true, nil
 }
