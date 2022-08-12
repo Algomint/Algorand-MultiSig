@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, { Fragment, useEffect, useState } from "react";
 import TextField from "@material-ui/core/TextField";
 import buffer from "buffer";
-import { Controller, useForm } from "react-hook-form";
+import { Controller, useForm, useWatch } from "react-hook-form";
 import Button from "@material-ui/core/Button";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import Typography from "@material-ui/core/Typography";
@@ -10,6 +10,12 @@ import { AppService } from "../services/app.service";
 import "../App.css";
 import useStyles from "../style";
 import Autocomplete from "@mui/material/Autocomplete";
+
+type BackendTxnIdsResponse = {
+  success: boolean;
+  message: string;
+  txnids: string[];
+};
 
 declare const AlgoSigner: any;
 
@@ -31,7 +37,7 @@ function App() {
   } = useForm<signArgs>({
     mode: "onChange",
     defaultValues: {
-      txnID: "",
+      txnID: undefined,
       signerAddr: {
         address: "",
       },
@@ -43,6 +49,8 @@ function App() {
 
   const { Buffer } = buffer;
   if (!window.Buffer) window.Buffer = Buffer;
+
+  const appService = new AppService();
 
   useEffect(() => {
     AlgoSigner.connect()
@@ -59,10 +67,6 @@ function App() {
   }, []);
 
   const onSubmit = handleSubmit(async data => {
-    //alert(JSON.stringify(data));
-
-    const appService = new AppService();
-
     let txnID = data.txnID;
 
     const getResponse = await appService.getRawTxn(txnID).catch((e: Error) => {
@@ -134,6 +138,24 @@ function App() {
     }
   });
 
+  const [optionsTxnId, setOptionsTxnId] = useState<readonly string[]>([]);
+  const sAddr = useWatch({ name: "signerAddr", control });
+
+  useEffect(() => {
+    (async () => {
+      const resp: BackendTxnIdsResponse = await appService.getTxnIds(
+        sAddr.address
+      );
+
+      if (resp && resp.success) {
+        setOptionsTxnId(resp.txnids);
+      }
+    })();
+
+    return () => {};
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sAddr]);
+
   return (
     <Container component="main" maxWidth="xs">
       <CssBaseline />
@@ -165,7 +187,7 @@ function App() {
                   id="checkboxes-addrs"
                   options={addrs}
                   freeSolo={true}
-                  disableCloseOnSelect
+                  //disableCloseOnSelect
                   getOptionLabel={(option: AddrType) =>
                     option.address.slice(0, 6) + "..."
                   }
@@ -190,18 +212,43 @@ function App() {
             />
           </div>
           <div>
-            <TextField
-              {...register("txnID", { required: true })}
+            <Controller
+              render={({ field: { onChange, value } }) => (
+                <Autocomplete
+                  {...register("txnID", { required: true })}
+                  id="txnId"
+                  onChange={(event, item) => {
+                    onChange(item);
+                  }}
+                  value={value || null}
+                  isOptionEqualToValue={(option, value) => option === value}
+                  getOptionLabel={option => (option ? option : "No option")}
+                  options={optionsTxnId}
+                  filterOptions={ops => ops}
+                  renderInput={params => (
+                    <TextField
+                      {...params}
+                      label="TnxID"
+                      variant="outlined"
+                      type="text"
+                      margin="normal"
+                      fullWidth
+                      InputProps={{
+                        ...params.InputProps,
+                        endAdornment: (
+                          <Fragment>{params.InputProps.endAdornment}</Fragment>
+                        ),
+                      }}
+                    />
+                  )}
+                />
+              )}
               name="txnID"
-              margin="normal"
-              label="txnID to sign"
-              autoFocus
-              variant="outlined"
-              fullWidth
-              type="text"
+              control={control}
+              rules={{ required: true }}
             />
-            {errors.txnID && <div className="error"> Enter txnID</div>}
           </div>
+          {errors.txnID && <div className="error"> Enter txnID</div>}
 
           <Button
             className={classes.submit}
