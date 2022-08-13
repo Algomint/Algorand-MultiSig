@@ -35,12 +35,12 @@ const useStyles = makeStyles((theme) => ({
     root: {
         marginRight: 10,
         marginBottom: 10,
-        maxWidth: '100%',
-        width: '20%',
-        [theme.breakpoints.down("sm")]: {
-          marginBottom: 10,
-          maxWidth: '100%',
-          width: '77%'
+        width: '77%',
+        [theme.breakpoints.between(1280, 4000)]: {
+          width: '20%'
+        },
+        [theme.breakpoints.between(960, 1280)]: {
+          width: '40%'
         },
     },
     image:{
