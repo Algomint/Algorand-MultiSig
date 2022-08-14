@@ -20,9 +20,10 @@ type GetSingedTxnResponse struct {
 }
 
 type GetRawTxnResponse struct {
-	Success bool         `json:"success"`
-	Message string       `json:"message"`
-	Txn     model.RawTxn `json:"txn"`
+	Success      bool                  `json:"success"`
+	Message      string                `json:"message"`
+	Txn          model.RawTxn          `json:"txn"`
+	SignersAddrs []model.SignerAddress `json:"signers_addrs"`
 }
 
 type GetRawTxnSignersAddrsResponse struct {

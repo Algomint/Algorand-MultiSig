@@ -31,9 +31,11 @@ func CreateTable(db *gorm.DB) error {
 	}
 
 	const rawQueryCreateTxn = "CREATE TABLE IF NOT EXISTS RawTransaction (" +
-		"raw_transaction TEXT NOT NULL, " +
+		"raw_transaction TEXT NOT NULL UNIQUE, " +
 		"txn_id TEXT PRIMARY KEY NOT NULL, " +
 		"number_of_signs_required INTEGER NOT NULL, " +
+		"signers_threshold INTEGER NOT NULL, " +
+		"number_of_signs_total INTEGER NOT NULL, " +
 		"version required INTEGER NOT NULL, " +
 		"status TEXT );"
 

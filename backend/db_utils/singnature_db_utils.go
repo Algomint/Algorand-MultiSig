@@ -124,10 +124,27 @@ func GetRawTxnOnTxnId(txnId string) (dto.GetRawTxnResponse, error) {
 		}, tx.Error
 	}
 
+	addrs, err := FindAllSignerAddrWithTxnId(txnId)
+
+	if err != nil {
+		return dto.GetRawTxnResponse{
+			Message: tx.Error.Error(),
+			Success: false,
+		}, tx.Error
+	}
+
+	if len(addrs) != int(rawTxn.NumberOfSignsTotal) {
+		return dto.GetRawTxnResponse{
+			Message: "Number of signers mismatch ",
+			Success: false,
+		}, tx.Error
+	}
+
 	return dto.GetRawTxnResponse{
-		Message: "Txn Found",
-		Success: true,
-		Txn:     rawTxn,
+		Message:      "Txn Found",
+		Success:      true,
+		Txn:          rawTxn,
+		SignersAddrs: addrs,
 	}, nil
 }
 
@@ -230,7 +247,7 @@ func GetTxnIdOnAddr(addr string) (dto.GetTxnIdsResponse, error) {
 		return dto.GetTxnIdsResponse{
 			Success: true,
 			Message: "No txnid found",
-			TxnIds: []string{},
+			TxnIds:  []string{},
 		}, nil
 	}
 
@@ -245,7 +262,12 @@ func GetTxnIdOnAddr(addr string) (dto.GetTxnIdsResponse, error) {
 		Message: fmt.Sprintf("Valid txnIds for address %s found", addr),
 		TxnIds:  addrTxnIds,
 	}, nil
+}
 
+func FindAllSignerAddrWithTxnId(txnId string) ([]model.SignerAddress, error) {
+	var signers []model.SignerAddress
+	err := db.DbConnection.Where("sign_txn_id = ?", txnId).Find(&signers).Error
+	return signers, err
 }
 
 func isValidAddress(addr string) (bool, error) {

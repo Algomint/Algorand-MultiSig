@@ -1,12 +1,6 @@
+import { RawTxnBackendResponseType } from "./../models/apiModels";
 export class AppService {
-  public async getTxn(txID: any): Promise<any> {
-    const response = await fetch(
-      "http://localhost:8081/ms-multisig-db/v1/gettxn/?id=" + txID
-    );
-    return await response.json();
-  }
-
-  public async getRawTxn(txID: any): Promise<any> {
+  public async getRawTxn(txID: string): Promise<RawTxnBackendResponseType> {
     const response = await fetch(
       "http://localhost:8081/ms-multisig-db/v1/getrawtxn?id=" + txID
     );

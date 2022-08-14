@@ -11,7 +11,7 @@ import (
 )
 
 func CreateRawTransaction(txn dto.RawTxn) (dto.Response, error) {
-	logger.Info(fmt.Sprintf("received txn: %+v " , txn))
+	logger.Info(fmt.Sprintf("received txn: %+v ", txn))
 	signersAddrs := []model.SignerAddress{}
 
 	for _, addr := range txn.SignersAddreses {
@@ -25,21 +25,34 @@ func CreateRawTransaction(txn dto.RawTxn) (dto.Response, error) {
 	isValidRawtxn, err := utils.ValidateRawTxnAgainsParameters(txn.TxnId, txn.Transaction, uint8(txn.NumberOfSignsRequired), txn.Version, txn.SignersAddreses)
 
 	if !isValidRawtxn {
-		return dto.Response{}, err
+		logger.Error("Error in AddRawTxn with the message : ", zap.Error(err))
+		return dto.Response{
+			Success: false,
+			Message: "Error validation RawTxn " + err.Error(),
+		}, err
 	}
 
-	rawTxn := model.RawTxn{RawTransaction: txn.Transaction, TxnId: txn.TxnId, NumberOfSignsRequired: txn.NumberOfSignsRequired, Version: txn.Version}
+	rawTxn := model.RawTxn{RawTransaction: txn.Transaction, TxnId: txn.TxnId,
+		NumberOfSignsRequired: txn.NumberOfSignsRequired,
+		SignersThreshold:      txn.NumberOfSignsRequired,
+		NumberOfSignsTotal:    int64(len(txn.SignersAddreses)), Version: txn.Version}
 	err = db_utils.AddRawTxn(rawTxn)
 
 	if err != nil {
-		logger.Error("Error in AddRawTxn with the message : ", zap.Error(err))
-		return dto.Response{}, err
+		logger.Error("Error in AddRawTxn with the message: ", zap.Error(err))
+		return dto.Response{
+			Success: false,
+			Message: "Error adding RawTxn to db:" + err.Error(),
+		}, err
 	}
 
 	err = db_utils.AddSignersAddrs(signersAddrs)
 	if err != nil {
-		logger.Error("Error in AddSignersAddrs with the message : ", zap.Error(err))
-		return dto.Response{}, err
+		logger.Error("Error in AddSignersAddrs with the message: ", zap.Error(err))
+		return dto.Response{
+			Success: false,
+			Message: "Error adding signers to db: " + err.Error(),
+		}, err
 	}
 
 	return dto.Response{Success: true, Message: "Transaction Added"}, nil

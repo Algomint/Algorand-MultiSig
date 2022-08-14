@@ -10,17 +10,19 @@ import { AppService } from "../services/app.service";
 import "../App.css";
 import useStyles from "../style";
 import Autocomplete from "@mui/material/Autocomplete";
+import RawTxnTable from "../components/rawTxnTable";
+import { RawTxnBackendResponseType } from "../models/apiModels";
 
-type BackendTxnIdsResponse = {
+declare const AlgoSigner: any;
+
+type TxnIdsBackendResponseType = {
   success: boolean;
   message: string;
   txnids: string[];
 };
 
-declare const AlgoSigner: any;
-
 type signArgs = {
-  txnID: string;
+  txnID: string | null;
   signerAddr: AddrType;
 };
 
@@ -33,6 +35,7 @@ function App() {
     control,
     register,
     handleSubmit,
+    setValue,
     formState: { errors },
   } = useForm<signArgs>({
     mode: "onChange",
@@ -68,7 +71,9 @@ function App() {
 
   const onSubmit = handleSubmit(async data => {
     let txnID = data.txnID;
-
+    if (txnID == null) {
+      return;
+    }
     const getResponse = await appService.getRawTxn(txnID).catch((e: Error) => {
       alert("Cannot get RawTxn from backend. Error: " + e.message);
       console.error(e);
@@ -86,16 +91,15 @@ function App() {
 
     let base64MultisigTx = getResponse.txn.raw_transaction;
     console.log(base64MultisigTx);
+    const addrs = getResponse.signers_addrs.map(e => {
+      return e.signer_address;
+    });
 
-    //Get data from localstorage
-    let mparams = { version: 1, threshold: 2, addrs: [] };
-    const lmparams = localStorage.getItem("mparams");
-    if (lmparams) {
-      mparams = JSON.parse(lmparams);
-    } else {
-      alert("transaction params not found. Did you generate multisig address?");
-      return;
-    }
+    const mparams = {
+      version: getResponse.txn.version,
+      threshold: getResponse.txn.signers_threshold,
+      addrs: addrs,
+    };
 
     let signedTxs = await AlgoSigner.signTxn([
       {
@@ -129,6 +133,7 @@ function App() {
 
       if (response && response.success) {
         alert("Signed txn added to backend!");
+        setValue("txnID", null);
       } else {
         alert("Error from backend: " + JSON.stringify(response));
       }
@@ -139,22 +144,45 @@ function App() {
   });
 
   const [optionsTxnId, setOptionsTxnId] = useState<readonly string[]>([]);
-  const sAddr = useWatch({ name: "signerAddr", control });
+  const wSignerAddr = useWatch({ name: "signerAddr", control });
+  const wTxnID = useWatch({ name: "txnID", control });
+  const [rawTxn, setRawTxn] = useState<RawTxnBackendResponseType | null>();
 
   useEffect(() => {
     (async () => {
-      const resp: BackendTxnIdsResponse = await appService.getTxnIds(
-        sAddr.address
+      const resp: TxnIdsBackendResponseType = await appService.getTxnIds(
+        wSignerAddr.address
       );
 
       if (resp && resp.success) {
         setOptionsTxnId(resp.txnids);
+      } else {
+        setOptionsTxnId([]);
       }
+      setValue("txnID", null);
     })();
-
     return () => {};
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sAddr]);
+  }, [wSignerAddr]);
+
+  useEffect(() => {
+    (async () => {
+      if (wTxnID == null) {
+        setRawTxn(null);
+        return;
+      }
+      const resp: RawTxnBackendResponseType = await appService.getRawTxn(
+        wTxnID
+      );
+      if (resp && resp.success) {
+        setRawTxn(resp);
+      } else {
+        setRawTxn(null);
+      }
+    })();
+    return () => {};
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [wTxnID]);
 
   return (
     <Container component="main" maxWidth="xs">
@@ -222,7 +250,7 @@ function App() {
                   }}
                   value={value || null}
                   isOptionEqualToValue={(option, value) => option === value}
-                  getOptionLabel={option => (option ? option : "No option")}
+                  getOptionLabel={option => option}
                   options={optionsTxnId}
                   filterOptions={ops => ops}
                   renderInput={params => (
@@ -249,7 +277,7 @@ function App() {
             />
           </div>
           {errors.txnID && <div className="error"> Enter txnID</div>}
-
+          {rawTxn && <RawTxnTable txn={rawTxn} />}
           <Button
             className={classes.submit}
             color="primary"
