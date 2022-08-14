@@ -45,6 +45,8 @@ func SetupRouter() *gin.Engine {
 		txn.GET("getsignedtxn", controller.GetSignedTxn)
 
 		txn.GET("gettxnids", controller.GetTxnIdsFromAddr)
+
+		txn.GET("getdonetxnid", controller.GetDoneTxn)
 	}
 
 	return r

@@ -1,6 +1,7 @@
 package db_utils
 
 import (
+	"errors"
 	"fmt"
 	"multisigdb-svc/db"
 	"multisigdb-svc/dto"
@@ -268,6 +269,37 @@ func FindAllSignerAddrWithTxnId(txnId string) ([]model.SignerAddress, error) {
 	var signers []model.SignerAddress
 	err := db.DbConnection.Where("sign_txn_id = ?", txnId).Find(&signers).Error
 	return signers, err
+}
+
+func GetDoneTxn(txnId string) (model.DoneTransaction, error) {
+	var doneTxn model.DoneTransaction
+	result := db.DbConnection.Where("txn_id = ?", txnId).Last(&doneTxn)
+
+	if result.Error != nil {
+		return model.DoneTransaction{}, result.Error
+	}
+
+	if result.RowsAffected == 0 {
+		return model.DoneTransaction{}, errors.New(fmt.Sprintf("No Transaction found for %s", txnId))
+	}
+
+	if result.RowsAffected > 1 {
+		return model.DoneTransaction{}, errors.New(fmt.Sprintf("More than one Transaction found for %s", txnId))
+	}
+
+	return doneTxn, nil
+}
+
+func AddDoneTxn(txnId string, doneTxnId string) error {
+	var doneTxn = model.DoneTransaction{
+		TxnId:         txnId,
+		TransactionID: doneTxnId,
+	}
+	err := db.DbConnection.Create(&doneTxn).Error
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func isValidAddress(addr string) (bool, error) {

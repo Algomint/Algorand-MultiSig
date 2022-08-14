@@ -51,11 +51,17 @@ func waitForConfirmation(txID, networkTxID string, client *algod.Client) {
 			return
 		}
 		if pt.ConfirmedRound > 0 {
+			err := db_utils.AddDoneTxn(txID, networkTxID)
+			if err != nil {
+				logger.Error("Error adding transaction to done transactions database with error message :", zap.Error(err))
+				break
+			}
 			ok := db_utils.UpdateStatusOfTransaction(txID, "BROADCASTED")
 			if ok != nil {
 				logger.Error("Error while updating the status of transaction to success with the error message :", zap.Error(ok))
+				break
 			}
-			logger.Info(fmt.Sprintf("Transaction confirmed in round %d\n", pt.ConfirmedRound))
+			logger.Info(fmt.Sprintf("Transaction %s confirmed in round %d\n", networkTxID, pt.ConfirmedRound))
 			break
 		}
 		logger.Info("Waiting for confirmation...")

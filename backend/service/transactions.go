@@ -146,3 +146,21 @@ func GetRawTransaction(txnId string) (dto.GetRawTxnResponse, error) {
 func GetTxnIdsWithAddr(addr string) (dto.GetTxnIdsResponse, error) {
 	return db_utils.GetTxnIdOnAddr(addr)
 }
+
+func GetDoneTxn(txnId string) (dto.GetDoneTxnReponse, error) {
+	doneTxn, err := db_utils.GetDoneTxn(txnId)
+
+	if err != nil {
+		return dto.GetDoneTxnReponse{
+			Success: false,
+			Message: "Error retreiving done transaction",
+		}, err
+	}
+
+	return dto.GetDoneTxnReponse{
+		Success:  true,
+		Message:  "Done Transaction Found",
+		DoneTxns: doneTxn,
+	}, nil
+
+}

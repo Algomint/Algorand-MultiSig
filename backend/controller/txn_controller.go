@@ -111,3 +111,21 @@ func GetTxnIdsFromAddr(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusOK, resp)
 }
+
+func GetDoneTxn(ctx *gin.Context) {
+	txnId := ctx.Query("id")
+
+	if txnId == "" {
+		resp := dto.Response{Success: false, Message: "Failed to process request send valid id"}
+		ctx.JSON(http.StatusBadRequest, resp)
+		return
+	}
+
+	resp, err := service.GetDoneTxn(txnId)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, resp)
+		return
+	}
+
+	ctx.JSON(http.StatusOK, resp)
+}

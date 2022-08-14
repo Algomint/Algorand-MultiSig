@@ -37,3 +37,9 @@ type GetTxnIdsResponse struct {
 	Message string   `json:"message"`
 	TxnIds  []string `json:"txnids"`
 }
+
+type GetDoneTxnReponse struct {
+	Success  bool                  `json:"success"`
+	Message  string                `json:"message"`
+	DoneTxns model.DoneTransaction `json:"done_txn"`
+}

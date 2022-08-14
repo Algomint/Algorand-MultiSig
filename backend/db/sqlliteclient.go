@@ -57,5 +57,18 @@ func CreateTable(db *gorm.DB) error {
 		return tx.Error
 	}
 
+	const rawQueryCreateDoneTransaction = "CREATE TABLE IF NOT EXISTS DoneTransaction ( " +
+		"id INTEGER PRIMARY KEY AUTOINCREMENT," +
+		"txn_id TEXT NOT NULL, " +
+		"transaction_id TEXT NOT NULL, " +
+		"CONSTRAINT fk_txn_id " +
+		"FOREIGN KEY (txn_id) " +
+		"REFERENCES RawTransaction(txn_id) );"
+
+	tx = db.Exec(rawQueryCreateDoneTransaction)
+	if tx.Error != nil {
+		return tx.Error
+	}
+
 	return nil
 }
