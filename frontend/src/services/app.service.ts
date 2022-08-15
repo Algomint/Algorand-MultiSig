@@ -1,15 +1,20 @@
-import { RawTxnBackendResponseType } from "./../models/apiModels";
+import {
+  RawTxnBackendResponseType,
+  TransactionNetworkIdType,
+} from "./../models/apiModels";
 export class AppService {
+  private static readonly endpoint = "http://localhost:8081";
+
   public async getRawTxn(txID: string): Promise<RawTxnBackendResponseType> {
     const response = await fetch(
-      "http://localhost:8081/ms-multisig-db/v1/getrawtxn?id=" + txID
+      AppService.endpoint + `/ms-multisig-db/v1/getrawtxn?id=` + txID
     );
     return await response.json();
   }
   //change to signed
   public async addSignedTxn(signer: any, txn: any, txid: any) {
     const response = await fetch(
-      `http://localhost:8081/ms-multisig-db/v1/addsignedtxn`,
+      AppService.endpoint + `/ms-multisig-db/v1/addsignedtxn`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -31,7 +36,7 @@ export class AppService {
     addrs: string[]
   ) {
     const response = await fetch(
-      `http://localhost:8081/ms-multisig-db/v1/addrawtxn`,
+      AppService.endpoint + `/ms-multisig-db/v1/addrawtxn`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -49,7 +54,20 @@ export class AppService {
 
   public async getTxnIds(addr: string) {
     const response = await fetch(
-      `http://localhost:8081/ms-multisig-db/v1/gettxnids?addr=` + addr,
+      AppService.endpoint + `/ms-multisig-db/v1/gettxnids?addr=` + addr,
+      {
+        method: "GET",
+        headers: { "Content-Type": "application/json" },
+      }
+    );
+    return await response.json();
+  }
+
+  public async getTransactionNetworkId(
+    txnid: string
+  ): Promise<TransactionNetworkIdType> {
+    const response = await fetch(
+      AppService.endpoint + `/ms-multisig-db/v1/getdonetxnid?id=` + txnid,
       {
         method: "GET",
         headers: { "Content-Type": "application/json" },

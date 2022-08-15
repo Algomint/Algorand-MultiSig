@@ -277,7 +277,7 @@ function App() {
             />
           </div>
           {errors.txnID && <div className="error"> Enter txnID</div>}
-          {rawTxn && <RawTxnTable txn={rawTxn} />}
+          {rawTxn && <RawTxnTable txn={rawTxn} appService={appService} />}
           <Button
             className={classes.submit}
             color="primary"

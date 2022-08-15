@@ -154,7 +154,7 @@ function App() {
 
     const txnRaw = algosdk.decodeUnsignedTransaction(b);
     setRawTxn(txnRaw);
-  
+
     const appService = new AppService();
     const response = await appService
       .addRawTxn(
@@ -223,7 +223,6 @@ function App() {
               label="Creator addresss"
               type="text"
               variant="outlined"
-              autoFocus
               margin="normal"
               defaultValue=""
               fullWidth
@@ -240,7 +239,6 @@ function App() {
               label="NFT asset name"
               type="text"
               variant="outlined"
-              autoFocus
               margin="normal"
               defaultValue=""
               fullWidth
@@ -260,7 +258,6 @@ function App() {
               label="NFT unit name"
               type="text"
               variant="outlined"
-              autoFocus
               margin="normal"
               defaultValue=""
               fullWidth
@@ -280,7 +277,6 @@ function App() {
               label="NFT asset url"
               type="text"
               variant="outlined"
-              autoFocus
               margin="normal"
               defaultValue=""
               fullWidth
@@ -301,7 +297,6 @@ function App() {
               label="NFT note"
               type="text"
               variant="outlined"
-              autoFocus
               margin="normal"
               defaultValue=""
               fullWidth
@@ -316,7 +311,6 @@ function App() {
               label="NFT manager"
               type="text"
               variant="outlined"
-              autoFocus
               margin="normal"
               defaultValue=""
               fullWidth
@@ -327,7 +321,6 @@ function App() {
               label="NFT reserve"
               type="text"
               variant="outlined"
-              autoFocus
               margin="normal"
               defaultValue=""
               fullWidth
@@ -338,7 +331,6 @@ function App() {
               label="NFT clawback"
               type="text"
               variant="outlined"
-              autoFocus
               margin="normal"
               defaultValue=""
               fullWidth
@@ -349,7 +341,6 @@ function App() {
               label="NFT freeze"
               type="text"
               variant="outlined"
-              autoFocus
               margin="normal"
               defaultValue=""
               fullWidth
@@ -360,7 +351,6 @@ function App() {
               label="NFT Metadata Hash"
               type="text"
               variant="outlined"
-              autoFocus
               margin="normal"
               defaultValue=""
               fullWidth
@@ -375,7 +365,6 @@ function App() {
               label="Number of NFT"
               type="number"
               variant="outlined"
-              autoFocus
               margin="normal"
               defaultValue=""
               fullWidth
@@ -390,7 +379,6 @@ function App() {
               label="NFT decimals"
               type="number"
               variant="outlined"
-              autoFocus
               margin="normal"
               defaultValue=""
               fullWidth
@@ -411,7 +399,6 @@ function App() {
               label="Raw transaction Id"
               type="text"
               variant="outlined"
-              autoFocus
               margin="normal"
               defaultValue=""
               fullWidth

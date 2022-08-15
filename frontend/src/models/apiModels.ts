@@ -19,3 +19,12 @@ export type RawTxnBackendResponseType = {
   txn: rawTxnType;
   signers_addrs: signersAddrsType[];
 };
+
+export type TransactionNetworkIdType = {
+  success: boolean;
+  message: string;
+  done_txn: {
+    txn_id: string;
+    transaction_id: string;
+  };
+};

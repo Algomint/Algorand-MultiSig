@@ -1,4 +1,4 @@
-import * as React from "react";
+import React, { useState, useEffect } from "react";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
@@ -14,26 +14,75 @@ import Typography from "@mui/material/Typography";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import { RawTxnBackendResponseType } from "../models/apiModels";
-import { useState } from "react";
 import { decodeBase64RawTxnToTransaction } from "../utils/decode";
 import algosdk from "algosdk";
 import CircularProgress from "@mui/material/CircularProgress";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import { AppService } from "../services/app.service";
+import Link from "@mui/material/Link";
 
-export default function RawTxnTable(props: { txn: RawTxnBackendResponseType }) {
+export default function RawTxnTable(props: {
+  txn: RawTxnBackendResponseType;
+  appService: AppService;
+}) {
   const classes = useStyles();
   const [open, setOpen] = useState(false);
+  const [networkIdUrl, setNetworkIdUrl] = useState("");
+
   let key = 1;
 
   function cut(str: string, cutLen: number) {
     return str.slice(0, cutLen) + "..." + str.slice(-cutLen);
   }
 
-  function TxnStatus() {
+  useEffect(() => {
+    const getNetworkTxnIdURL: () => Promise<void> = async () => {
+      const resp = await props.appService.getTransactionNetworkId(
+        props.txn.txn.txn_id
+      );
+      const url =
+        "https://goalseeker.purestake.io/algorand/testnet/transaction/" +
+        resp.done_txn.transaction_id;
+      setNetworkIdUrl(url);
+    };
+
+    getNetworkTxnIdURL().catch((e: Error) => {
+      console.error("Error geting networkId " + e);
+    });
+    return () => {
+      setNetworkIdUrl("");
+    };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [props.txn.txn.txn_id]);
+
+  function TxnStatus(): JSX.Element {
     if (props.txn.txn.status === "BROADCASTED") {
-      return <CheckCircleIcon color="success" />;
+      return (
+        <>
+          <TableCell align="left" size="small" padding="none">
+            <TableRow sx={{ "& td": { border: 0 } }}>
+              <TableCell align="left">
+                <CheckCircleIcon color="success" />
+              </TableCell>
+              <TableCell align="left">
+                <Link
+                  href={networkIdUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  check transaction in goal seeker
+                </Link>
+              </TableCell>
+            </TableRow>
+          </TableCell>
+        </>
+      );
     } else {
-      return <CircularProgress size={18} />;
+      return (
+        <TableCell align="left">
+          <CircularProgress size={18} />
+        </TableCell>
+      );
     }
   }
 
@@ -117,9 +166,9 @@ export default function RawTxnTable(props: { txn: RawTxnBackendResponseType }) {
             <TableCell component="th" scope="row">
               Status
             </TableCell>
-            <TableCell align="left">
-              <TxnStatus />
-            </TableCell>
+
+            <TxnStatus />
+
             <TableCell>
               {props.txn.txn.status
                 ? props.txn.txn.status
