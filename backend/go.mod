@@ -7,6 +7,7 @@ require (
 	github.com/gin-gonic/gin v1.8.1
 	github.com/goccy/go-json v0.9.8
 	github.com/robfig/cron/v3 v3.0.0
+	github.com/ulule/limiter/v3 v3.10.0
 	go.uber.org/zap v1.21.0
 	gorm.io/driver/sqlite v1.3.6
 	gorm.io/gorm v1.23.8
