@@ -28,3 +28,8 @@ export type TransactionNetworkIdType = {
     transaction_id: string;
   };
 };
+
+export type TokenResponse = {
+  success: boolean;
+  token: string;
+}

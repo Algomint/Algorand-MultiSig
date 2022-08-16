@@ -21,6 +21,24 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/": {
+            "get": {
+                "description": "Sends CSRF Token to dApp",
+                "tags": [
+                    "CSRF Token"
+                ],
+                "summary": "Sends CSRF Token to dApp",
+                "operationId": "sendCsrfToken",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.TokenResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/addrawtxn": {
             "post": {
                 "description": "Add a Raw Transaction from dto.RawTxn Model",
@@ -406,6 +424,17 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "txn_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.TokenResponse": {
+            "type": "object",
+            "properties": {
+                "success": {
+                    "type": "boolean"
+                },
+                "token": {
                     "type": "string"
                 }
             }

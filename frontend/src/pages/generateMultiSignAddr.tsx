@@ -32,9 +32,8 @@ type multiAddrArgs = {
 };
 
 function App() {
-  
   const nav = useNavigate();
-  
+
   const {
     control,
     register,
@@ -138,7 +137,7 @@ function App() {
     localStorage.setItem("multiSignAddr", JSON.stringify(multsigaddr));
   }
 
-  const onSubmit = handleSubmit(async (data) => {
+  const onSubmit = handleSubmit(async data => {
     //alert(JSON.stringify(data));
     const addrs: AddrType[] = data.walletAddrs.concat(data.userAddrs);
     generateMultiSignAddrs(data.threshold, addrs);
@@ -165,16 +164,23 @@ function App() {
         </Typography>
         <form className={classes.form} onSubmit={onSubmit}>
           <div>
-            <Typography component="h1" variant="h6" className={classes.paragraph}>
-            <strong>Step 1</strong>: Choose total of signing addresses
+            <Typography
+              component="h1"
+              variant="h6"
+              className={classes.paragraph}
+            >
+              <strong>Step 1</strong>: Choose total of signing addresses
             </Typography>
             <TextField
-              {...register("totalAddr", { required: true, min: 1, valueAsNumber:true })}
+              {...register("totalAddr", {
+                required: true,
+                min: 1,
+                valueAsNumber: true,
+              })}
               id="totalAddr"
               label="Number of signing addresess"
               type="number"
               variant="outlined"
-              autoFocus
               margin="normal"
               defaultValue={3}
               InputProps={{ inputProps: { min: 1, max: 99 } }}
@@ -185,7 +191,11 @@ function App() {
                 Enter a number of addresses to add to multisign account
               </div>
             )}
-            <Typography component="h1" variant="h6"  className={classes.paragraph}>
+            <Typography
+              component="h1"
+              variant="h6"
+              className={classes.paragraph}
+            >
               <strong>Step 2</strong>: Choose threshold
             </Typography>
             <TextField
@@ -193,26 +203,27 @@ function App() {
                 required: true,
                 min: 1,
                 max: totalAddr,
-                valueAsNumber:true
+                valueAsNumber: true,
               })}
               id="threshold"
               label="Number of threshold addresess"
               type="number"
               variant="outlined"
               defaultValue={2}
-              autoFocus
               margin="normal"
               InputProps={{ inputProps: { min: 1, max: totalAddr } }}
               fullWidth
             />
             {errors.threshold && (
-              <div className="error">
-                Enter a number of threshold addresses
-              </div>
+              <div className="error">Enter a number of threshold addresses</div>
             )}
-            <Typography component="h1" variant="h6" className={classes.paragraph}>
-            <strong>Step 3</strong>: Choose up to {totalAddr} signing addresses from AlgoSigner
-              Wallet
+            <Typography
+              component="h1"
+              variant="h6"
+              className={classes.paragraph}
+            >
+              <strong>Step 3</strong>: Choose up to {totalAddr} signing
+              addresses from AlgoSigner Wallet (Be careful addresses order changes multisig address)
             </Typography>
             <Controller
               render={({ field: { onChange, value } }) => (
@@ -231,9 +242,7 @@ function App() {
                   getOptionDisabled={(options: AddrType) =>
                     walletAddrs.length >= totalAddr ? true : false
                   }
-                  getOptionLabel={(option) =>
-                    option.address.slice(0, 6) + "..."
-                  }
+                  getOptionLabel={option => option.address.slice(0, 6) + "..."}
                   renderOption={(props, option, { selected }) => (
                     <li {...props}>
                       <Checkbox
@@ -245,7 +254,7 @@ function App() {
                       {option.address}
                     </li>
                   )}
-                  renderInput={(params) => (
+                  renderInput={params => (
                     <TextField
                       {...params}
                       label="Addreses from wallet"
@@ -262,9 +271,13 @@ function App() {
               rules={{ required: true }}
             />
             {totalAddr - walletAddrs.length > 0 && (
-              <Typography component="h1" variant="h6" className={classes.paragraph}>
-                <strong>Step 4</strong>: Enter remaining {totalAddr - walletAddrs.length}{" "}
-                addresses manualy
+              <Typography
+                component="h1"
+                variant="h6"
+                className={classes.paragraph}
+              >
+                <strong>Step 4</strong>: Enter remaining{" "}
+                {totalAddr - walletAddrs.length} addresses manualy
               </Typography>
             )}
             {totalAddr - walletAddrs.length > 0 &&
@@ -293,16 +306,16 @@ function App() {
           </div>
         </form>
         <Button
-              className={classes.submit}
-              color="primary"
-              variant="contained"
-              onClick={() => nav("/genRawTxn")}
-              fullWidth
-              type="button"
-              endIcon={nextIcon}
-            >
-              Skip to generate raw transaction
-            </Button>
+          className={classes.submit}
+          color="primary"
+          variant="contained"
+          onClick={() => nav("/genRawTxn")}
+          fullWidth
+          type="button"
+          endIcon={nextIcon}
+        >
+          Skip to generate raw transaction
+        </Button>
         <DialogMultiSig
           open={open}
           handleClose={handleClose}

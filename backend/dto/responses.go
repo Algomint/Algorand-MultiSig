@@ -43,3 +43,8 @@ type GetDoneTxnReponse struct {
 	Message  string                `json:"message"`
 	DoneTxns model.DoneTransaction `json:"done_txn"`
 }
+
+type TokenResponse struct {
+	Success bool   `json:"success"`
+	Token   string `json:"token"`
+}

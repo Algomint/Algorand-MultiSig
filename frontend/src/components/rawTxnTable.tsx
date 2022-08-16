@@ -52,30 +52,18 @@ export default function RawTxnTable(props: {
     return () => {
       setNetworkIdUrl("");
     };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [props.txn.txn.txn_id]);
 
   function TxnStatus(): JSX.Element {
     if (props.txn.txn.status === "BROADCASTED") {
       return (
-        <>
-          <TableCell align="left" size="small" padding="none">
-            <TableRow sx={{ "& td": { border: 0 } }}>
-              <TableCell align="left">
-                <CheckCircleIcon color="success" />
-              </TableCell>
-              <TableCell align="left">
-                <Link
-                  href={networkIdUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  check transaction in goal seeker
-                </Link>
-              </TableCell>
-            </TableRow>
-          </TableCell>
-        </>
+        <TableCell align="left" size="small" padding="none">
+          <CheckCircleIcon color="success" />
+          <Link href={networkIdUrl} target="_blank" rel="noopener noreferrer">
+            check transaction in goal seeker
+          </Link>
+        </TableCell>
       );
     } else {
       return (

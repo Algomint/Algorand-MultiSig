@@ -94,6 +94,13 @@ definitions:
     - signer_public_address
     - txn_id
     type: object
+  dto.TokenResponse:
+    properties:
+      success:
+        type: boolean
+      token:
+        type: string
+    type: object
   model.DoneTransaction:
     properties:
       transaction_id:
@@ -147,6 +154,18 @@ info:
   title: Multisig Backend API
   version: "1.0"
 paths:
+  /:
+    get:
+      description: Sends CSRF Token to dApp
+      operationId: sendCsrfToken
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.TokenResponse'
+      summary: Sends CSRF Token to dApp
+      tags:
+      - CSRF Token
   /addrawtxn:
     post:
       consumes:
