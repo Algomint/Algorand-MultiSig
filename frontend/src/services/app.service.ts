@@ -1,6 +1,6 @@
 import {
   RawTxnBackendResponseType,
-  TokenResponse,
+  TokenResponseType,
   TransactionNetworkIdType,
 } from "./../models/apiModels";
 
@@ -13,7 +13,7 @@ export class AppService {
       headers: { "Content-Type": "application/json" },
       credentials: "include",
     });
-    const json: TokenResponse = await response.json();
+    const json: TokenResponseType = await response.json();
     return json.token;
   }
 

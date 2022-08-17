@@ -63,6 +63,7 @@ func CSRF() gin.HandlerFunc {
 }
 
 func SetupRouter() (*gin.Engine, error) {
+	// setup rate limiter
 	rate, err := limiter.NewRateFromFormatted(config.LimiterRate)
 	if err != nil {
 		return nil, err

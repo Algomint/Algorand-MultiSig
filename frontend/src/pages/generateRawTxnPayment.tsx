@@ -202,8 +202,8 @@ function App() {
               {...register("amount", {
                 required: true,
                 min: {
-                  value: 1,
-                  message: "Amount must be 1 or more microAlgos",
+                  value: 100000,
+                  message: "Amount must be 100000 or more microAlgos",
                 },
                 valueAsNumber: true,
               })}

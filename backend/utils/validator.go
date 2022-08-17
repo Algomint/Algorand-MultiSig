@@ -2,20 +2,19 @@ package utils
 
 import (
 	"errors"
-	"multisigdb-svc/db_utils"
 	"github.com/algorand/go-algorand-sdk/crypto"
 	"github.com/algorand/go-algorand-sdk/encoding/msgpack"
 	"github.com/algorand/go-algorand-sdk/types"
+	"multisigdb-svc/db_utils"
 )
-
 
 func ValidateDuplicatePublicAddress(pubAddress, txnId string) bool {
 	return db_utils.CheckIfAPubAddressFound(txnId, pubAddress)
 }
 
 // Validates received rawTxn agains it's parameters
-// return true, nil if valid
-// false, error otherwise
+// return (true, nil) if valid
+// 		  (false, error) otherwise
 func ValidateRawTxnAgainsParameters(txnId, rawTxnBase64 string, threshold, version uint8, signers []string) (bool, error) {
 	rawTxn, err := Base64Decode(rawTxnBase64)
 

@@ -1,6 +1,9 @@
 package db
 
 import (
+	"fmt"
+	"multisigdb-svc/config"
+
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 )
@@ -8,7 +11,7 @@ import (
 var DbConnection *gorm.DB
 
 func InitiateDbClient() (*gorm.DB, error) {
-	db, err := gorm.Open(sqlite.Open("data/sqlite.db"), &gorm.Config{})
+	db, err := gorm.Open(sqlite.Open(fmt.Sprintf("%s/%s", config.DbFolder, config.DbFileName)), &gorm.Config{})
 	if err != nil {
 		return nil, err
 	}

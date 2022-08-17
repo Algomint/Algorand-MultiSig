@@ -29,7 +29,7 @@ export type TransactionNetworkIdType = {
   };
 };
 
-export type TokenResponse = {
+export type TokenResponseType = {
   success: boolean;
   token: string;
 }

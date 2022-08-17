@@ -1,16 +1,21 @@
 package main
 
 import (
-	"github.com/robfig/cron/v3"
-	"go.uber.org/zap"
+	"fmt"
+	"multisigdb-svc/config"
 	"multisigdb-svc/db"
 	"multisigdb-svc/pkg/utils"
 	"multisigdb-svc/router"
 	"multisigdb-svc/service"
+	"os"
+
+	"github.com/robfig/cron/v3"
+	"go.uber.org/zap"
+
+	_ "multisigdb-svc/docs"
 
 	"github.com/swaggo/files"
 	"github.com/swaggo/gin-swagger"
-	_ "multisigdb-svc/docs"
 )
 
 // @title           Multisig Backend API
@@ -30,15 +35,22 @@ func main() {
 	logger := utils.GetLoggerInstance()
 
 	logger.Info("Multi-sig go service starting ...")
-
+	
+	//Database
+	err = os.MkdirAll(config.DbFolder, os.ModePerm)
+	if err != nil {
+		logger.Error("Error creating database folder", zap.Error(err))
+		return
+	}
 	db.DbConnection, err = db.InitiateDbClient()
 	if err != nil {
 		logger.Error("Error in opening the connection with Error Message ", zap.Error(err))
 		return
 	}
-
+	
+	// cron job
 	broadCastTxnJob := cron.New()
-	broadCastTxnJob.AddFunc("@every 1m", service.BroadCastTheSignedTxn)
+	broadCastTxnJob.AddFunc(config.CronJobSpec, service.BroadCastTheSignedTxn)
 	broadCastTxnJob.Start()
 
 	// api routes
@@ -49,8 +61,8 @@ func main() {
 
 	// route for api docs
 	r.GET("/api-doc/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
-
-	if err = r.Run(":8081"); err != nil {
+	port := fmt.Sprintf(":%s", config.BindPort)
+	if err = r.Run(port); err != nil {
 		logger.Error("Error while binding the port with the error message ", zap.Error(err))
 	}
 
