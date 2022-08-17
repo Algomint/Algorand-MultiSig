@@ -50,7 +50,7 @@ const MultisigDialog = (props: propsType): JSX.Element => {
           <li>threshold: {props.mparams.threshold}</li>
           <li>
             accounts:
-            {props.mparams.addrs.map(e => e.slice(1, 6) + "..., ")}
+            {props.mparams.addrs.map(e => e.slice(0, 6) + "..., ")}
           </li>
         </ul>
         <p>Multisign address is:</p>

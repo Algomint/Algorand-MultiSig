@@ -2,7 +2,7 @@ import React from 'react';
 import WalletAuth from './pages/walletAuth'
 import GenerateMultiSignAddr from './pages/generateMultiSignAddr'
 import SignTxn from "./pages/signTxn";
-import GenerateRawTxn from "./pages/generateRawTxn"
+import GenerateRawTxn from "./pages/generateRawTxnChooser"
 import {
   BrowserRouter as Router,
   Route,

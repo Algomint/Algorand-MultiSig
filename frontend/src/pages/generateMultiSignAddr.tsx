@@ -223,7 +223,7 @@ function App() {
               className={classes.paragraph}
             >
               <strong>Step 3</strong>: Choose up to {totalAddr} signing
-              addresses from AlgoSigner Wallet (Be careful addresses order changes multisig address)
+              addresses from AlgoSigner Wallet (Be carefull: addresses order changes multisig address)
             </Typography>
             <Controller
               render={({ field: { onChange, value } }) => (

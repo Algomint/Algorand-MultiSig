@@ -19,6 +19,7 @@ import byteArrayToBase64 from "../utils/encode";
 import { AppService } from "../services/app.service";
 import RawTxnDialog from "../components/rawTxnDialog";
 import base64ToArrayBuffer from "../utils/decode";
+import { customAlphabet } from "nanoid";
 
 type rawTxnArgs = {
   creator: string;
@@ -38,6 +39,8 @@ type rawTxnArgs = {
 };
 
 function App() {
+  const alphabet = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  const nanoid = customAlphabet(alphabet, 21);
   const nav = useNavigate();
   const [mparams, setMprams] = useState<mparamsType>({
     version: 1,
@@ -68,7 +71,7 @@ function App() {
       assetMetadataHash: "",
       total: 1,
       decimals: 0,
-      txnId: "txn-id",
+      txnId: nanoid(),
     },
   });
   const classes = useStyles();
@@ -205,9 +208,6 @@ function App() {
     <Container component="main" maxWidth="xs">
       <CssBaseline />
       <div className={classes.paper}>
-        <Typography component="h1" variant="h5">
-          Generate Raw Transaction
-        </Typography>
         <form className={classes.form} onSubmit={onSubmit}>
           <div>
             <Typography

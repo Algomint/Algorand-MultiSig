@@ -78,49 +78,103 @@ export default function RawTxnTable(props: {
     const decodedRawTxn = decodeBase64RawTxnToTransaction(
       props.txn.txn.raw_transaction
     );
-    return (
-      <TableRow>
-        <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={3}>
-          <Collapse in={open} timeout="auto" unmountOnExit>
-            <Box>
-              <Typography gutterBottom component="div">
-                Asset Data (From{" "}
-                {cut(algosdk.encodeAddress(decodedRawTxn.from.publicKey), 25)})
-              </Typography>
-              <Table size="small" aria-label="purchases">
-                <TableHead>
-                  <TableRow>
-                    <TableCell>Asset Name</TableCell>
-                    <TableCell>Asset Unit Name</TableCell>
-                    <TableCell align="right">Asset URL</TableCell>
-                    <TableCell align="right">Asset Manager Address</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  <TableRow>
-                    <TableCell component="th" scope="row">
-                      {decodedRawTxn.assetName}
-                    </TableCell>
-                    <TableCell>{decodedRawTxn.assetUnitName}</TableCell>
-                    <TableCell align="right">
-                      {decodedRawTxn.assetURL}
-                    </TableCell>
-                    <TableCell align="right">
-                      {cut(
-                        algosdk.encodeAddress(
-                          decodedRawTxn.assetManager.publicKey
-                        ),
-                        20
-                      )}
-                    </TableCell>
-                  </TableRow>
-                </TableBody>
-              </Table>
-            </Box>
-          </Collapse>
-        </TableCell>
-      </TableRow>
-    );
+    if (decodedRawTxn.type === algosdk.TransactionType.acfg) {
+      return (
+        <TableRow>
+          <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={3}>
+            <Collapse in={open} timeout="auto" unmountOnExit>
+              <Box>
+                <Typography gutterBottom component="div">
+                  Asset Data (From{" "}
+                  {cut(algosdk.encodeAddress(decodedRawTxn.from.publicKey), 25)}
+                  )
+                </Typography>
+                <Table size="small" aria-label="purchases">
+                  <TableHead>
+                    <TableRow>
+                      <TableCell>Asset Name</TableCell>
+                      <TableCell>Asset Unit Name</TableCell>
+                      <TableCell align="right">Asset URL</TableCell>
+                      <TableCell align="right">Asset Manager Address</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    <TableRow>
+                      <TableCell component="th" scope="row">
+                        {decodedRawTxn.assetName}
+                      </TableCell>
+                      <TableCell>{decodedRawTxn.assetUnitName}</TableCell>
+                      <TableCell align="right">
+                        {decodedRawTxn.assetURL}
+                      </TableCell>
+                      <TableCell align="right">
+                        {cut(
+                          algosdk.encodeAddress(
+                            decodedRawTxn.assetManager.publicKey
+                          ),
+                          20
+                        )}
+                      </TableCell>
+                    </TableRow>
+                  </TableBody>
+                </Table>
+              </Box>
+            </Collapse>
+          </TableCell>
+        </TableRow>
+      );
+    }
+
+    if (decodedRawTxn.type === algosdk.TransactionType.pay) {
+      return (
+        <TableRow>
+          <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={3}>
+            <Collapse in={open} timeout="auto" unmountOnExit>
+              <Box>
+                <Table size="small" aria-label="purchases">
+                  <TableHead>
+                    <TableRow>
+                      <TableCell>From</TableCell>
+                      <TableCell component="th" scope="row">
+                        {cut(
+                          algosdk.encodeAddress(decodedRawTxn.from.publicKey),
+                          25
+                        )}
+                      </TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    <TableRow>
+                      <TableCell>To </TableCell>
+                      <TableCell>
+                        {cut(
+                          algosdk.encodeAddress(decodedRawTxn.to.publicKey),
+                          25
+                        )}
+                      </TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell align="left">Amount</TableCell>
+                      <TableCell align="left">
+                        {decodedRawTxn.amount} microAlgos
+                      </TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell align="left">Note</TableCell>
+                      <TableCell align="left">
+                        {new TextDecoder().decode(decodedRawTxn.note)}
+                      </TableCell>
+                    </TableRow>
+                  </TableBody>
+                </Table>
+              </Box>
+            </Collapse>
+          </TableCell>
+        </TableRow>
+      );
+    }
+
+    return <></>;
   }
 
   return (
