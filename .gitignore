@@ -8,3 +8,4 @@ backend/data/sqlite.db
 test/*
 algo-scripts/addresses.txt
 backend/dist
+frontend/build
