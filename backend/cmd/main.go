@@ -16,6 +16,7 @@ import (
 
 	"github.com/swaggo/files"
 	"github.com/swaggo/gin-swagger"
+	docs "multisigdb-svc/docs"
 )
 
 // @title           Multisig Backend API
@@ -60,6 +61,7 @@ func main() {
 	}
 
 	// route for api docs
+	docs.SwaggerInfo.Host = config.SwaggerHost
 	r.GET("/api-doc/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	port := fmt.Sprintf(":%s", config.BindPort)
 	if err = r.Run(port); err != nil {

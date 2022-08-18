@@ -43,4 +43,8 @@ const (
 	JwtTokenHeadName = "Bearer"
 	JwtTimeout       = 12 * time.Hour
 	JwtMaxRefresh    = 12 * time.Hour
+	//Swagger
+	SwaggerHost = "localhost:8081/"
+	//CORS
+	CorsAllowOrigin = "http://localhost:3000"
 )
