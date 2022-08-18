@@ -3,9 +3,10 @@ import {
   TokenResponseType,
   TransactionNetworkIdType,
 } from "./../models/apiModels";
+import configData from "../config/config.json";
 
 export class AppService {
-  private static readonly endpoint = "http://localhost:8081";
+  private static readonly endpoint = configData.MSIG_END_POINT_URL;
   private static async getCSRFToken(): Promise<string> {
     const response = await fetch(AppService.endpoint + `/ms-multisig-db/v1/`, {
       method: "GET",

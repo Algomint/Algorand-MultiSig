@@ -123,7 +123,14 @@ cd frontend
 npm i or npm install
 ```
 
-head to utils/algodClient.ts and update the X-API-Key key-pair with your purestake api key.
+head to .\config\config.json and update the X-API-Key key-pair with your purestake api key.
+```json
+{
+  "MSIG_END_POINT_URL": "http://localhost:8081",
+  "AUTH_END_POINT_URL": "http://localhost:8081",
+  "PS_TOKEN": "your X-API purestake api key here"
+}
+```
 
 ```
 npm start
