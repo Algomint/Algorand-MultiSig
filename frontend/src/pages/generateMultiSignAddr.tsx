@@ -33,7 +33,6 @@ type multiAddrArgs = {
 
 function App() {
   const nav = useNavigate();
-
   const {
     control,
     register,
@@ -101,6 +100,7 @@ function App() {
   const nextIcon = <NavigateNextIcon />;
 
   useEffect(() => {
+    console.log()
     AlgoSigner.connect()
       .then(() => {
         AlgoSigner.accounts({

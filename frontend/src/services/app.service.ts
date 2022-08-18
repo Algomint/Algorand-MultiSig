@@ -6,11 +6,13 @@ import {
 
 export class AppService {
   private static readonly endpoint = "http://localhost:8081";
-
-  private static async getToken(): Promise<string> {
+  private static async getCSRFToken(): Promise<string> {
     const response = await fetch(AppService.endpoint + `/ms-multisig-db/v1/`, {
       method: "GET",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + localStorage.getItem("jwtToken"),
+      },
       credentials: "include",
     });
     const json: TokenResponseType = await response.json();
@@ -22,14 +24,18 @@ export class AppService {
       AppService.endpoint + `/ms-multisig-db/v1/getrawtxn?id=` + txID,
       {
         method: "GET",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + localStorage.getItem("jwtToken"),
+        },
+        credentials: "include",
       }
     );
     return await response.json();
   }
   //change to signed
   public async addSignedTxn(signer: any, txn: any, txid: any) {
-    const token = await AppService.getToken();
+    const token = await AppService.getCSRFToken();
     const response = await fetch(
       AppService.endpoint + `/ms-multisig-db/v1/addsignedtxn`,
       {
@@ -37,6 +43,7 @@ export class AppService {
         headers: {
           "Content-Type": "application/json",
           "X-CSRF-Token": token,
+          Authorization: "Bearer " + localStorage.getItem("jwtToken"),
         },
         credentials: "include",
         body: JSON.stringify({
@@ -56,7 +63,7 @@ export class AppService {
     version: number,
     addrs: string[]
   ) {
-    const token = await AppService.getToken();
+    const token = await AppService.getCSRFToken();
     const response = await fetch(
       AppService.endpoint + `/ms-multisig-db/v1/addrawtxn`,
       {
@@ -64,6 +71,7 @@ export class AppService {
         headers: {
           "Content-Type": "application/json",
           "X-CSRF-Token": token,
+          Authorization: "Bearer " + localStorage.getItem("jwtToken"),
         },
         credentials: "include",
         body: JSON.stringify({
@@ -83,7 +91,11 @@ export class AppService {
       AppService.endpoint + `/ms-multisig-db/v1/gettxnids?addr=` + addr,
       {
         method: "GET",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + localStorage.getItem("jwtToken"),
+        },
+        credentials: "include",
       }
     );
     return await response.json();
@@ -96,7 +108,11 @@ export class AppService {
       AppService.endpoint + `/ms-multisig-db/v1/getdonetxnid?id=` + txnid,
       {
         method: "GET",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + localStorage.getItem("jwtToken"),
+        },
+        credentials: "include",
       }
     );
     return await response.json();

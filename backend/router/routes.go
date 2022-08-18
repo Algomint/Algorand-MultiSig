@@ -2,13 +2,17 @@ package router
 
 import (
 	"fmt"
-	"github.com/gin-gonic/gin"
 	"multisigdb-svc/config"
 	"multisigdb-svc/controller"
+	"multisigdb-svc/service"
 	"net/http"
+
+	jwt "github.com/appleboy/gin-jwt/v2"
+	"github.com/gin-gonic/gin"
 
 	limiter "github.com/ulule/limiter/v3"
 	mgin "github.com/ulule/limiter/v3/drivers/middleware/gin"
+
 	// if redis store use those two imports else comment it
 	// sredis "github.com/ulule/limiter/v3/drivers/store/redis"
 	// libredis "github.com/go-redis/redis/v8"
@@ -95,7 +99,19 @@ func SetupRouter() (*gin.Engine, error) {
 	r.Use(limiter)
 	r.Use(CORS)
 
-	txn := r.Group("ms-multisig-db/v1").Use(CSRF())
+	// Jwt Auth Middleware
+	authMiddleware, err := service.AuthMiddleware()
+
+	if err != nil {
+		return nil, err
+	}
+	//login route just sends signtxn to verify 
+	r.POST("/login", authMiddleware.LoginHandler)
+	auth := r.Group("/auth")
+	// Refresh time can be longer than token timeout
+	auth.GET("/refresh_token", authMiddleware.RefreshHandler)
+	
+	txn := r.Group("ms-multisig-db/v1").Use(CSRF()).Use(authMiddleware.MiddlewareFunc())
 	{
 		txn.GET("/", controller.SendCsrfToken)
 
@@ -110,5 +126,15 @@ func SetupRouter() (*gin.Engine, error) {
 		txn.GET("getdonetxnid", controller.GetDoneTxn)
 	}
 
+	
+
 	return r, nil
+}
+
+
+func helloHandler(c *gin.Context) {
+	claims := jwt.ExtractClaims(c) // from auth
+	c.JSON(200, gin.H{
+		"addrs":   claims[service.IdentityKeyJwt],
+	})
 }

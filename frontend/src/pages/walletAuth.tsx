@@ -16,8 +16,8 @@ function App() {
   const nav = useNavigate();
 
 
-  function login() {
-    auth.signin(() => {
+  async function login() {
+    await auth.signin(() => {
       nav("/genMulti");
     });
   }
