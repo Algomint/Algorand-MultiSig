@@ -5,7 +5,11 @@ This repository contains the backend code for storing Multi sig transaction info
 You need executed the following commands.
 
 This command will be executed only once to fetch all the dependencies.<br>
-`go mod tidy` 
+```console
+foo@bar:~/backend$ go mod tidy
+``` 
 
 To the run the project run <br>
-`go run cmd/main.go`
+```console
+foo@bar:~/backend$ go run cmd/main.go`
+```

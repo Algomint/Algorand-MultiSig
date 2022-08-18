@@ -50,12 +50,17 @@ async function mintToken() {
         //
         let binaryMultisigTx = txn.toByte();
         let base64MultisigTx = byteArrayToBase64(binaryMultisigTx);
-
+        console.log("-----RawTxn base64 -----")
+        console.log(base64MultisigTx)
         let txID = "test-id-txn"
         let numSign = 2;
-
-        const response = await AppService(txID, base64MultisigTx, numSign);
-        console.log(response);
+        console.log("-----txtID-----")
+        console.log(txID)
+        console.log("-----numSign-----")
+        console.log(numSign)
+        // not compatible with new api 
+        //const response = await AppService(txID, base64MultisigTx, numSign);
+        //console.log(response);
     }
     catch (err) {
         console.log("err", err);
