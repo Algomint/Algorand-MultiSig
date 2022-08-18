@@ -6,3 +6,4 @@ Algorand-MultiSig.code-workspace
 backend/out.json
 backend/data/sqlite.db
 test/*
+algo-scripts/addresses.txt
