@@ -1,4 +1,6 @@
-![example event parameter](https://github.com/github/docs/actions/workflows/main.yml/badge.svg?event=push)
+[![Go](https://github.com/nabetse00/Algorand-MultiSig/actions/workflows/go.yml/badge.svg)](https://github.com/nabetse00/Algorand-MultiSig/actions/workflows/go.yml)
+
+[![Node.js CI](https://github.com/nabetse00/Algorand-MultiSig/actions/workflows/node.js.yml/badge.svg)](https://github.com/nabetse00/Algorand-MultiSig/actions/workflows/node.js.yml)
 
 # Algorand Multi-Sig Signer
 
