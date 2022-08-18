@@ -101,16 +101,17 @@ func SetupRouter() (*gin.Engine, error) {
 
 	// Jwt Auth Middleware
 	authMiddleware, err := service.AuthMiddleware()
-
 	if err != nil {
 		return nil, err
 	}
+
 	//login route just sends signtxn to verify 
 	r.POST("/login", authMiddleware.LoginHandler)
 	auth := r.Group("/auth")
 	// Refresh time can be longer than token timeout
 	auth.GET("/refresh_token", authMiddleware.RefreshHandler)
-	
+
+	// uses CSRF and jwt Auth tokens
 	txn := r.Group("ms-multisig-db/v1").Use(CSRF()).Use(authMiddleware.MiddlewareFunc())
 	{
 		txn.GET("/", controller.SendCsrfToken)
