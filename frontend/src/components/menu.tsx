@@ -12,7 +12,7 @@ import Tooltip from "@mui/material/Tooltip";
 import MenuItem from "@mui/material/MenuItem";
 import useStyles from "../style";
 import { ReactComponent as Logo } from "../assets/logo.svg";
-import { useWallet } from "../hooks/walletHook";
+import { useAuth } from "../hooks/walletHook";
 import CancelIcon from "@mui/icons-material/Cancel";
 import AlgoSignerLogo from "../assets/AlgoSignerLarge-inverted.png";
 import { useNavigate } from "react-router-dom";
@@ -34,7 +34,7 @@ const ResponsiveAppBar = () => {
   );
 
   const classes = useStyles();
-  const auth = useWallet();
+  const auth = useAuth();
   const nav = useNavigate()
 
   const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {

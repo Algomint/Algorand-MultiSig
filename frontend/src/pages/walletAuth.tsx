@@ -7,12 +7,12 @@ import Container from "@material-ui/core/Container";
 import Alert from "@mui/material/Alert";
 import "../App.css";
 import useStyles from "../style";
-import { useWallet } from "../hooks/walletHook";
+import { useAuth } from "../hooks/walletHook";
 import { useNavigate } from "react-router-dom";
 
 function App() {
   const classes = useStyles();
-  const auth = useWallet();
+  const auth = useAuth();
   const nav = useNavigate();
 
 

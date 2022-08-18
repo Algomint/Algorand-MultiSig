@@ -30,7 +30,7 @@ export function ProvideAuth({ children }: any): JSX.Element {
 }
 
 // useAuth Custom Hook
-export const useWallet = () => {
+export const useAuth = () => {
   return useContext(authContext);
 };
 
