@@ -51,7 +51,7 @@ function App() {
     defaultValues: {
       from: "",
       to: "",
-      amount: 0,
+      amount: 100000,
       note: "Payment note",
       txnId: nanoid(),
     },
@@ -173,7 +173,7 @@ function App() {
               variant="h6"
               className={classes.paragraph}
             >
-              <strong>Step 1</strong>: Create NFT asset
+              <strong>Step 1</strong>: Create Payment Asset
             </Typography>
             <TextField
               {...register("from", { required: true })}
