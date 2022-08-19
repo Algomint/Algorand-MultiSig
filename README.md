@@ -115,7 +115,7 @@ Now you will have access to the following endpoints:
 Futher documentation of the following endpoints is avaible from
 swagger-ui url: http://localhost:8081/api-doc/index.html
 
-You can also consult directly swagger files form backend/docs folder
+You can also consult directly swagger files from backend/docs folder
 
 ![swagger-ui api img ](./img/api.jpg)
 
