@@ -3,11 +3,14 @@ package service
 import (
 	"context"
 	"fmt"
-	"github.com/algorand/go-algorand-sdk/client/v2/algod"
-	"github.com/algorand/go-algorand-sdk/crypto"
-	"go.uber.org/zap"
 	"multisigdb-svc/db_utils"
 	"multisigdb-svc/utils"
+
+	"github.com/algorand/go-algorand-sdk/client/v2/algod"
+	"github.com/algorand/go-algorand-sdk/crypto"
+	"github.com/algorand/go-algorand-sdk/encoding/msgpack"
+	"github.com/algorand/go-algorand-sdk/types"
+	"go.uber.org/zap"
 )
 
 func MergeTransactions(txnId string) ([]byte, string, error) {
@@ -16,8 +19,21 @@ func MergeTransactions(txnId string) ([]byte, string, error) {
 		return nil, "", err
 	}
 
+	if len(response.Txn) == 1 {
+		logger.Info("Fix for only one signer in MergeMultisigTransactions")
+		decodedTxn, err := utils.Base64Decode(response.Txn[0].SignedTransaction)
+		if err != nil {
+			return nil, "", err
+		}
+		var signedTxn types.SignedTxn
+		msgpack.Decode(decodedTxn, &signedTxn)
+		txnId := crypto.TransactionIDString(signedTxn.Txn)
+		return decodedTxn, txnId, nil
+	}
+
 	var mergedSignedTxns [][]byte
-	for index, _ := range response.Txn {
+
+	for index := range response.Txn {
 		decodedTxn, err := utils.Base64Decode(response.Txn[index].SignedTransaction)
 		if err != nil {
 			logger.Error("Error Found in Decoding the transaction with the error message ", zap.Error(err))
@@ -51,11 +67,17 @@ func waitForConfirmation(txID, networkTxID string, client *algod.Client) {
 			return
 		}
 		if pt.ConfirmedRound > 0 {
+			err := db_utils.AddDoneTxn(txID, networkTxID)
+			if err != nil {
+				logger.Error("Error adding transaction to done transactions database with error message :", zap.Error(err))
+				break
+			}
 			ok := db_utils.UpdateStatusOfTransaction(txID, "BROADCASTED")
 			if ok != nil {
 				logger.Error("Error while updating the status of transaction to success with the error message :", zap.Error(ok))
+				break
 			}
-			logger.Info(fmt.Sprintf("Transaction confirmed in round %d\n", pt.ConfirmedRound))
+			logger.Info(fmt.Sprintf("Transaction %s confirmed in round %d\n", networkTxID, pt.ConfirmedRound))
 			break
 		}
 		logger.Info("Waiting for confirmation...")

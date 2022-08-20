@@ -20,7 +20,31 @@ type GetSingedTxnResponse struct {
 }
 
 type GetRawTxnResponse struct {
-	Success bool         `json:"success"`
-	Message string       `json:"message"`
-	Txn     model.RawTxn `json:"txn"`
+	Success      bool                  `json:"success"`
+	Message      string                `json:"message"`
+	Txn          model.RawTxn          `json:"txn"`
+	SignersAddrs []model.SignerAddress `json:"signers_addrs"`
+}
+
+type GetRawTxnSignersAddrsResponse struct {
+	Success bool                  `json:"success"`
+	Message string                `json:"message"`
+	Addrs   []model.SignerAddress `json:"signersAddrs"`
+}
+
+type GetTxnIdsResponse struct {
+	Success bool     `json:"success"`
+	Message string   `json:"message"`
+	TxnIds  []string `json:"txnids"`
+}
+
+type GetDoneTxnReponse struct {
+	Success  bool                  `json:"success"`
+	Message  string                `json:"message"`
+	DoneTxns model.DoneTransaction `json:"done_txn"`
+}
+
+type TokenResponse struct {
+	Success bool   `json:"success"`
+	Token   string `json:"token"`
 }

@@ -1,0 +1,334 @@
+basePath: ms-multisig-db/v1
+definitions:
+  dto.GetAllSingedTxnResponse:
+    properties:
+      message:
+        type: string
+      success:
+        type: boolean
+      txn:
+        items:
+          $ref: '#/definitions/model.SignedTxn'
+        type: array
+    type: object
+  dto.GetDoneTxnReponse:
+    properties:
+      done_txn:
+        $ref: '#/definitions/model.DoneTransaction'
+      message:
+        type: string
+      success:
+        type: boolean
+    type: object
+  dto.GetRawTxnResponse:
+    properties:
+      message:
+        type: string
+      signers_addrs:
+        items:
+          $ref: '#/definitions/model.SignerAddress'
+        type: array
+      success:
+        type: boolean
+      txn:
+        $ref: '#/definitions/model.RawTxn'
+    type: object
+  dto.GetSingedTxnResponse:
+    properties:
+      message:
+        type: string
+      success:
+        type: boolean
+      txn:
+        $ref: '#/definitions/model.SignedTxn'
+    type: object
+  dto.GetTxnIdsResponse:
+    properties:
+      message:
+        type: string
+      success:
+        type: boolean
+      txnids:
+        items:
+          type: string
+        type: array
+    type: object
+  dto.RawTxn:
+    properties:
+      number_of_signs_required:
+        type: integer
+      signers_addresses:
+        items:
+          type: string
+        type: array
+      transaction:
+        type: string
+      txn_id:
+        type: string
+      version:
+        type: integer
+    required:
+    - number_of_signs_required
+    - signers_addresses
+    - transaction
+    - txn_id
+    - version
+    type: object
+  dto.Response:
+    properties:
+      message:
+        type: string
+      success:
+        type: boolean
+    type: object
+  dto.SignedTxn:
+    properties:
+      signed_transaction:
+        type: string
+      signer_public_address:
+        type: string
+      txn_id:
+        type: string
+    required:
+    - signed_transaction
+    - signer_public_address
+    - txn_id
+    type: object
+  dto.TokenResponse:
+    properties:
+      success:
+        type: boolean
+      token:
+        type: string
+    type: object
+  model.DoneTransaction:
+    properties:
+      transaction_id:
+        type: string
+      txn_id:
+        type: string
+    type: object
+  model.RawTxn:
+    properties:
+      number_of_signs_required:
+        type: integer
+      number_of_signs_total:
+        type: integer
+      raw_transaction:
+        type: string
+      signers_threshold:
+        type: integer
+      status:
+        type: string
+      txn_id:
+        type: string
+      version:
+        type: integer
+    type: object
+  model.SignedTxn:
+    properties:
+      id:
+        type: integer
+      signed_transaction:
+        type: string
+      signer_public_address:
+        type: string
+      txn_id:
+        type: string
+    type: object
+  model.SignerAddress:
+    properties:
+      sign_txn_id:
+        type: string
+      signer_address:
+        type: string
+    type: object
+host: localhost:8081/
+info:
+  contact:
+    email: support@algorand.io
+    name: API Support
+    url: http://www.algorand.io/support
+  description: Multisig Backend API server.
+  termsOfService: http://algorand.io/terms
+  title: Multisig Backend API
+  version: "1.0"
+paths:
+  /:
+    get:
+      description: Sends CSRF Token to dApp
+      operationId: sendCsrfToken
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.TokenResponse'
+      summary: Sends CSRF Token to dApp
+      tags:
+      - CSRF Token
+  /addrawtxn:
+    post:
+      consumes:
+      - application/json
+      description: Add a Raw Transaction from dto.RawTxn Model
+      parameters:
+      - description: RawTxn
+        in: body
+        name: Body
+        required: true
+        schema:
+          $ref: '#/definitions/dto.RawTxn'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.Response'
+      summary: Adds a Raw Transaction
+      tags:
+      - RawTxn
+  /addsignedtxn:
+    post:
+      consumes:
+      - application/json
+      description: Add a Signed Transaction from dto.SignedTxn Model
+      parameters:
+      - description: SignedTxn
+        in: body
+        name: Body
+        required: true
+        schema:
+          $ref: '#/definitions/dto.SignedTxn'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.Response'
+      summary: Adds a Signed Transaction
+      tags:
+      - SignedTxn
+  /getallsignedtxn:
+    get:
+      description: Gets all signed transactions in database for a given transaction
+        id (in database)
+      operationId: getallsignedtxn
+      parameters:
+      - description: TxnID
+        in: query
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.GetAllSingedTxnResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.GetAllSingedTxnResponse'
+      summary: Gets all signed txn in database for a given txn-id
+      tags:
+      - SignedTxn
+  /getdonetxnid:
+    get:
+      description: Gets broadcasted NetworkId for a given transaction id in database
+      operationId: getdonetxnid
+      parameters:
+      - description: TxnID
+        in: query
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.GetDoneTxnReponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.GetDoneTxnReponse'
+      summary: Gets broadcasted NetworkId for a given txn-id
+      tags:
+      - TxnId
+  /getrawtxn:
+    get:
+      description: Gets raw transactions in database for a given transaction id (in
+        database)
+      operationId: getrawTxn
+      parameters:
+      - description: TxnID
+        in: query
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.GetRawTxnResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.GetRawTxnResponse'
+      summary: Gets RawTxn in database for a given txn-id
+      tags:
+      - RawTxn
+  /getsignedtxn:
+    get:
+      description: Gets latest signed transactions in database for a given transaction
+        id (in database)
+      operationId: getsignedtxn
+      parameters:
+      - description: TxnID
+        in: query
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.GetSingedTxnResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.GetSingedTxnResponse'
+      summary: Gets latest signed txn in database for a given txn-id
+      tags:
+      - SignedTxn
+  /gettxnids:
+    get:
+      description: Gets Transactions Ids in database for a given multisignature address
+      operationId: gettxnids
+      parameters:
+      - description: Address
+        in: query
+        name: addr
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.GetTxnIdsResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.GetRawTxnResponse'
+      summary: Gets TxnIds in database for a given address
+      tags:
+      - TxnId
+swagger: "2.0"

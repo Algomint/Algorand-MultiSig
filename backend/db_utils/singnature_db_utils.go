@@ -1,9 +1,13 @@
 package db_utils
 
 import (
+	"errors"
+	"fmt"
 	"multisigdb-svc/db"
 	"multisigdb-svc/dto"
 	"multisigdb-svc/model"
+
+	"github.com/algorand/go-algorand-sdk/types"
 )
 
 func UpdateNumberOfSignsRequired(txnId string) bool {
@@ -29,6 +33,14 @@ func UpdateNumberOfSignsRequired(txnId string) bool {
 }
 
 func AddRawTxn(txn model.RawTxn) error {
+	resp := db.DbConnection.Create(&txn)
+	if resp.Error != nil {
+		return resp.Error
+	}
+	return nil
+}
+
+func AddSignersAddrs(txn []model.SignerAddress) error {
 	resp := db.DbConnection.Create(&txn)
 	if resp.Error != nil {
 		return resp.Error
@@ -113,10 +125,52 @@ func GetRawTxnOnTxnId(txnId string) (dto.GetRawTxnResponse, error) {
 		}, tx.Error
 	}
 
+	addrs, err := FindAllSignerAddrWithTxnId(txnId)
+
+	if err != nil {
+		return dto.GetRawTxnResponse{
+			Message: tx.Error.Error(),
+			Success: false,
+		}, tx.Error
+	}
+
+	if len(addrs) != int(rawTxn.NumberOfSignsTotal) {
+		return dto.GetRawTxnResponse{
+			Message: "Number of signers mismatch ",
+			Success: false,
+		}, tx.Error
+	}
+
 	return dto.GetRawTxnResponse{
-		Message: "Txn Found",
+		Message:      "Txn Found",
+		Success:      true,
+		Txn:          rawTxn,
+		SignersAddrs: addrs,
+	}, nil
+}
+
+func GetRawTxnSignersOnTxnId(txnId string) (dto.GetRawTxnSignersAddrsResponse, error) {
+	var signersAddrs []model.SignerAddress
+	tx := db.DbConnection.Where("sign_txn_id = ?", txnId).Find(&signersAddrs)
+
+	if tx.Error != nil {
+		return dto.GetRawTxnSignersAddrsResponse{
+			Success: false,
+			Message: tx.Error.Error(),
+		}, tx.Error
+	}
+
+	if tx.RowsAffected == 0 {
+		return dto.GetRawTxnSignersAddrsResponse{
+			Message: "No Record Found",
+			Success: false,
+		}, tx.Error
+	}
+
+	return dto.GetRawTxnSignersAddrsResponse{
 		Success: true,
-		Txn:     rawTxn,
+		Message: "Txn Found",
+		Addrs:   signersAddrs,
 	}, nil
 }
 
@@ -168,4 +222,90 @@ func UpdateStatusOfTransactionToDone(txn string) error {
 		return err
 	}
 	return nil
+}
+
+func GetTxnIdOnAddr(addr string) (dto.GetTxnIdsResponse, error) {
+
+	_, err := isValidAddress(addr)
+
+	if err != nil {
+		return dto.GetTxnIdsResponse{
+			Success: false,
+			Message: "Error invalid address",
+		}, err
+	}
+
+	var signers []model.SignerAddress
+	err = db.DbConnection.Where("signer_address = ?", addr).Find(&signers).Error
+	if err != nil {
+		return dto.GetTxnIdsResponse{
+			Success: false,
+			Message: "Error getting txnIds wrong signer address?",
+		}, err
+	}
+
+	if len(signers) == 0 {
+		return dto.GetTxnIdsResponse{
+			Success: true,
+			Message: "No txnid found",
+			TxnIds:  []string{},
+		}, nil
+	}
+
+	var addrTxnIds []string
+
+	for _, e := range signers {
+		addrTxnIds = append(addrTxnIds, e.SignTxnId)
+	}
+
+	return dto.GetTxnIdsResponse{
+		Success: true,
+		Message: fmt.Sprintf("Valid txnIds for address %s found", addr),
+		TxnIds:  addrTxnIds,
+	}, nil
+}
+
+func FindAllSignerAddrWithTxnId(txnId string) ([]model.SignerAddress, error) {
+	var signers []model.SignerAddress
+	err := db.DbConnection.Where("sign_txn_id = ?", txnId).Find(&signers).Error
+	return signers, err
+}
+
+func GetDoneTxn(txnId string) (model.DoneTransaction, error) {
+	var doneTxn model.DoneTransaction
+	result := db.DbConnection.Where("txn_id = ?", txnId).Last(&doneTxn)
+
+	if result.Error != nil {
+		return model.DoneTransaction{}, result.Error
+	}
+
+	if result.RowsAffected == 0 {
+		return model.DoneTransaction{}, errors.New(fmt.Sprintf("No Transaction found for %s", txnId))
+	}
+
+	if result.RowsAffected > 1 {
+		return model.DoneTransaction{}, errors.New(fmt.Sprintf("More than one Transaction found for %s", txnId))
+	}
+
+	return doneTxn, nil
+}
+
+func AddDoneTxn(txnId string, doneTxnId string) error {
+	var doneTxn = model.DoneTransaction{
+		TxnId:         txnId,
+		TransactionID: doneTxnId,
+	}
+	err := db.DbConnection.Create(&doneTxn).Error
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func isValidAddress(addr string) (bool, error) {
+	_, err := types.DecodeAddress(addr)
+	if err != nil {
+		return false, err
+	}
+	return true, nil
 }

@@ -1,6 +1,9 @@
 package db
 
 import (
+	"fmt"
+	"multisigdb-svc/config"
+
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 )
@@ -8,7 +11,7 @@ import (
 var DbConnection *gorm.DB
 
 func InitiateDbClient() (*gorm.DB, error) {
-	db, err := gorm.Open(sqlite.Open("data/sqlite.db"), &gorm.Config{})
+	db, err := gorm.Open(sqlite.Open(fmt.Sprintf("%s/%s", config.DbFolder, config.DbFileName)), &gorm.Config{})
 	if err != nil {
 		return nil, err
 	}
@@ -31,14 +34,44 @@ func CreateTable(db *gorm.DB) error {
 	}
 
 	const rawQueryCreateTxn = "CREATE TABLE IF NOT EXISTS RawTransaction (" +
-		"raw_transaction TEXT NOT NULL, " +
-		"txn_id TEXT PRIMARY KEY NOT NULL," +
-		"number_of_signs_required INTEGER NOT NULL," +
-		"status TEXT)"
+		"raw_transaction TEXT NOT NULL UNIQUE, " +
+		"txn_id TEXT PRIMARY KEY NOT NULL, " +
+		"number_of_signs_required INTEGER NOT NULL, " +
+		"signers_threshold INTEGER NOT NULL, " +
+		"number_of_signs_total INTEGER NOT NULL, " +
+		"version required INTEGER NOT NULL, " +
+		"status TEXT );"
 
 	tx = db.Exec(rawQueryCreateTxn)
 	if tx.Error != nil {
 		return tx.Error
 	}
+
+	const rawQueryCreateSignerAddress = "CREATE TABLE IF NOT EXISTS SignerAddress (" +
+		"id INTEGER PRIMARY KEY AUTOINCREMENT," +
+		"sign_txn_id TEXT NOT NULL," +
+		"signer_address TEXT, " +
+		"CONSTRAINT fk_txn_id " +
+		"FOREIGN KEY (sign_txn_id) " +
+		"REFERENCES RawTransaction(txn_id) );"
+
+	tx = db.Exec(rawQueryCreateSignerAddress)
+	if tx.Error != nil {
+		return tx.Error
+	}
+
+	const rawQueryCreateDoneTransaction = "CREATE TABLE IF NOT EXISTS DoneTransaction ( " +
+		"id INTEGER PRIMARY KEY AUTOINCREMENT," +
+		"txn_id TEXT NOT NULL, " +
+		"transaction_id TEXT NOT NULL, " +
+		"CONSTRAINT fk_txn_id " +
+		"FOREIGN KEY (txn_id) " +
+		"REFERENCES RawTransaction(txn_id) );"
+
+	tx = db.Exec(rawQueryCreateDoneTransaction)
+	if tx.Error != nil {
+		return tx.Error
+	}
+
 	return nil
 }

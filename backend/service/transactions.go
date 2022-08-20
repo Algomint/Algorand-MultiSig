@@ -2,22 +2,59 @@ package service
 
 import (
 	"fmt"
-	"go.uber.org/zap"
 	"multisigdb-svc/db_utils"
 	"multisigdb-svc/dto"
 	"multisigdb-svc/model"
 	"multisigdb-svc/utils"
+
+	"go.uber.org/zap"
 )
 
 func CreateRawTransaction(txn dto.RawTxn) (dto.Response, error) {
+	logger.Info(fmt.Sprintf("received txn: %+v ", txn))
+	signersAddrs := []model.SignerAddress{}
 
-	rawTxn := model.RawTxn{RawTransaction: txn.Transaction, TxnId: txn.TxnId, NumberOfSignsRequired: txn.NumberOfSignsRequired}
-
-	err := db_utils.AddRawTxn(rawTxn)
-	if err != nil {
-		logger.Error("Error in AddRawTxn with the message : ", zap.Error(err))
-		return dto.Response{}, err
+	for _, addr := range txn.SignersAddreses {
+		obj := model.SignerAddress{
+			SignTxnId:     txn.TxnId,
+			SignerAddress: addr,
+		}
+		signersAddrs = append(signersAddrs, obj)
 	}
+
+	isValidRawtxn, err := utils.ValidateRawTxnAgainsParameters(txn.TxnId, txn.Transaction, uint8(txn.NumberOfSignsRequired), txn.Version, txn.SignersAddreses)
+
+	if !isValidRawtxn {
+		logger.Error("Error in AddRawTxn with the message : ", zap.Error(err))
+		return dto.Response{
+			Success: false,
+			Message: "Error validation RawTxn " + err.Error(),
+		}, err
+	}
+
+	rawTxn := model.RawTxn{RawTransaction: txn.Transaction, TxnId: txn.TxnId,
+		NumberOfSignsRequired: txn.NumberOfSignsRequired,
+		SignersThreshold:      txn.NumberOfSignsRequired,
+		NumberOfSignsTotal:    int64(len(txn.SignersAddreses)), Version: txn.Version}
+	err = db_utils.AddRawTxn(rawTxn)
+
+	if err != nil {
+		logger.Error("Error in AddRawTxn with the message: ", zap.Error(err))
+		return dto.Response{
+			Success: false,
+			Message: "Error adding RawTxn to db:" + err.Error(),
+		}, err
+	}
+
+	err = db_utils.AddSignersAddrs(signersAddrs)
+	if err != nil {
+		logger.Error("Error in AddSignersAddrs with the message: ", zap.Error(err))
+		return dto.Response{
+			Success: false,
+			Message: "Error adding signers to db: " + err.Error(),
+		}, err
+	}
+
 	return dto.Response{Success: true, Message: "Transaction Added"}, nil
 }
 
@@ -104,4 +141,26 @@ func GetSignedTransaction(txnId string) (dto.GetSingedTxnResponse, error) {
 
 func GetRawTransaction(txnId string) (dto.GetRawTxnResponse, error) {
 	return db_utils.GetRawTxnOnTxnId(txnId)
+}
+
+func GetTxnIdsWithAddr(addr string) (dto.GetTxnIdsResponse, error) {
+	return db_utils.GetTxnIdOnAddr(addr)
+}
+
+func GetDoneTxn(txnId string) (dto.GetDoneTxnReponse, error) {
+	doneTxn, err := db_utils.GetDoneTxn(txnId)
+
+	if err != nil {
+		return dto.GetDoneTxnReponse{
+			Success: false,
+			Message: "Error retreiving done transaction",
+		}, err
+	}
+
+	return dto.GetDoneTxnReponse{
+		Success:  true,
+		Message:  "Done Transaction Found",
+		DoneTxns: doneTxn,
+	}, nil
+
 }

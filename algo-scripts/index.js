@@ -10,7 +10,7 @@ async function mintToken() {
 
     try {
 
-        const msig_addr = "K6242JP5CEU52SGODDDHQ5626AI2M36KAXOP5JSKZTIZZKAYHPUZCULGFQ"
+        const msig_addr = "HURKQWPXZDRBRW6ZI7RE2AUKBBOZW6Z3LVGJEYVEVYZORBNQY6DJPJ5YOY"
         const algodClient = new algosdk.Algodv2(token, baseServer, port);
         let params = await algodClient.getTransactionParams().do();
 
@@ -50,12 +50,17 @@ async function mintToken() {
         //
         let binaryMultisigTx = txn.toByte();
         let base64MultisigTx = byteArrayToBase64(binaryMultisigTx);
-
-        let txID = "nameoftxn"
+        console.log("-----RawTxn base64 -----")
+        console.log(base64MultisigTx)
+        let txID = "test-id-txn"
         let numSign = 2;
-
-        const response = await AppService(txID, base64MultisigTx, numSign);
-        console.log(response);
+        console.log("-----txtID-----")
+        console.log(txID)
+        console.log("-----numSign-----")
+        console.log(numSign)
+        // not compatible with new api 
+        //const response = await AppService(txID, base64MultisigTx, numSign);
+        //console.log(response);
     }
     catch (err) {
         console.log("err", err);

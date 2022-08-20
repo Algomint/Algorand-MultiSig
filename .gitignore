@@ -2,3 +2,10 @@ algo-scripts/node_modules
 .DS_Store
 algo-scripts/.env
 frontend/node_modules
+Algorand-MultiSig.code-workspace
+backend/out.json
+backend/data/sqlite.db
+test/*
+algo-scripts/addresses.txt
+backend/dist
+frontend/build
