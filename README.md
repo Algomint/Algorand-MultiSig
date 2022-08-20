@@ -16,7 +16,8 @@ This repo, includes all of the code necessary to facilitate the signing of multi
 
 ### Links
 
-- [Video](https://www.youtube.com/watch?v=)
+- [Live Video Demonstration Loom](https://www.loom.com/share/cae4ef3ad1ba4de0936aba1f4bcbb4af)
+- [Live Video Demonstration Youtube](https://youtu.be/vTBiXi2K6M4)
 - [Demo frontend ](https://msigdapp.iteasys.com/)
 - [Demo backend ](https://msign.iteasys.com/api-doc/index.html)
 - [Repo](https://github.com/nabetse00/Algorand-MultiSig)
